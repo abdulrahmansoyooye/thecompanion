@@ -1,0 +1,6 @@
+ model MockUser {
+  id    Int @default(autoincrement())
+  email  String @unique 
+  passwordHash String
+  createdAt DateTime @default(now())
+}
