@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "clsx": "^2.1.1",
-    "lottie-react": "^2.4.1",
-    "zod": "^4.1.5"
-  }
-}
