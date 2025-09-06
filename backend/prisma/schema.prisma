@@ -10,10 +10,57 @@ datasource db {
 }
         
 
-
 model User {
-  id    Int @default(autoincrement())
+  id    String @id @default(cuid())
   email  String @unique 
   passwordHash String
   createdAt DateTime @default(now())
+  companions Companion[]
 }
+
+
+model Companion {
+  id String @id @default(cuid())
+  userId String
+  name String
+  topic String
+  voiceType String
+  style String
+  langauge String
+  mode  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId] , references: [id] )
+  conversations Conversation[]
+}
+
+
+model Conversation {
+  id String @id @default(cuid())
+  userId String
+  companionId String
+  messages Message[]
+  companion  Companion @relation(fields: [companionId], references: [id])
+}
+
+model Message{
+  id String @id @default(cuid())
+  from MessageFrom
+  type MessageType
+
+  content String
+  conversationId String
+  converasation Conversation @relation(fields: [conversationId], references: [id])
+
+  createdAt DateTime 
+}
+
+enum MessageFrom {
+  user
+  comapanion
+}
+enum MessageType {
+  text
+  voice
+}
+
