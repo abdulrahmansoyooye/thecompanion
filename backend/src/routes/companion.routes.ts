@@ -1,5 +1,5 @@
 import express from "express"
-import { createComapanion } from "../controllers/comapanion.controllers.js";
+import { createComapanion } from "../controllers/comapanion.controllers.ts";
 
 const companionRouter = express.Router();
 

@@ -1,15 +1,21 @@
+
+
 declare global {
     namespace Express {
         interface Response {
-            sendMassage:(
+            sendMessage:(
                 statusCode: number,
+                success:boolean,
                 message: string,
                 data?: any,
 
             )=> Response;
         }
         interface Request {
-            user?: {userId: string, role: string, email:string}
+            user?: {userId: string, role: string, email:string},
+           
         }
+        
+        
     }
 }

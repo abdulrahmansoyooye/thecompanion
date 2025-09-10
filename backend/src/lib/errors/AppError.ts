@@ -1,13 +1,11 @@
 export class AppError extends Error{
     public statusCode: number;
-    public message:string;
-    public data ?:any
+    public code:string;
 
-    constructor(message:string, statusCode=500, data:string){
+    constructor(message:string, statusCode=500, code:string ){
         super(message)
         this.statusCode = statusCode;
-        this.message = message;
-        this.data = data;
+        this.code = code
         Error.captureStackTrace(this,this.constructor)
     }
 }

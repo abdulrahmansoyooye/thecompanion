@@ -37,7 +37,10 @@
     "outDir": "dist",
     "rootDir": "src",
     "esModuleInterop": true,
+    "emitDeclarationOnly":true,
+    "allowImportingTsExtensions":true,
     "strict": true,
+    "allowJs": false,
     "skipLibCheck": true
   }
 }

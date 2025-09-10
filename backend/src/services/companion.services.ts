@@ -1,6 +1,19 @@
+import { prisma } from "../lib/prisma.ts"
+e
 export const ComapnionServices = {
-   async create(userId:string, payload:any){
-      return prisma
+   async create(usrId:string, payload:any){
+      // return prisma
    },
+   async list(){
+      // return 
+   },
+   async getOne(){
 
+   },
+   async update(){
+
+   },
+   async remove(){
+      
+   }
 }

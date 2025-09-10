@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Bricolage_Grotesque } from "next/font/google";
+import {  Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
 
-const bricolage = Geist({
+const bricolage = Bricolage_Grotesque({
   variable: "--font-bricolage",
   subsets: ["latin"],
 });
