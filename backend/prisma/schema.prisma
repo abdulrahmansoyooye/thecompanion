@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,59 +7,62 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
-        
 
 model User {
-  id    String @id @default(cuid())
-  email  String @unique 
-  passwordHash String
-  createdAt DateTime @default(now())
-  companions Companion[]
-}
-
-
-model Companion {
-  id String @id @default(cuid())
-  userId String
-  name String
-  topic String
-  voiceType String
-  style String
-  langauge String
-  mode  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user User @relation(fields: [userId] , references: [id] )
+  id            String         @id @default(cuid())
+  email         String         @unique
+  passwordHash  String
+  role          String
+  createdAt     DateTime       @default(now())
+  companions    Companion[]
   conversations Conversation[]
 }
 
-
-model Conversation {
-  id String @id @default(cuid())
-  userId String
-  companionId String
-  messages Message[]
-  companion  Companion @relation(fields: [companionId], references: [id])
+model Companion {
+  id            String         @id @default(cuid())
+  userId        String
+  name          String
+  topic         String
+  voiceType     String
+  style         String
+  langauge      String
+  mode          String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  user          User           @relation(fields: [userId], references: [id])
+  conversations Conversation[]
 }
 
-model Message{
-  id String @id @default(cuid())
+model Conversation {
+  id          String    @id @default(cuid())
+  userId      String
+  companionId String
+  messages    Message[]
+  companion   Companion @relation(fields: [companionId], references: [id])
+  User        User      @relation(fields: [userId], references: [id])
+}
+
+model Message {
+  id   String      @id @default(cuid())
   from MessageFrom
   type MessageType
 
-  content String
+  content        String
   conversationId String
-  converasation Conversation @relation(fields: [conversationId], references: [id])
+  converasation  Conversation @relation(fields: [conversationId], references: [id])
 
-  createdAt DateTime 
+  createdAt DateTime
 }
 
 enum MessageFrom {
   user
   comapanion
 }
+
 enum MessageType {
   text
   voice
 }
+
+  
 

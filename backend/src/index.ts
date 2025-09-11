@@ -2,7 +2,7 @@ import express from "express"
 import cors from "cors"
 import morgan from "morgan"
 import dotenv from "dotenv"
-import type {Request, RequestHandler, Response} from "express"
+import type { RequestHandler, Response} from "express"
 import cookieParser from "cookie-parser"
 import { router } from "./routes/index.ts"
 dotenv.config();

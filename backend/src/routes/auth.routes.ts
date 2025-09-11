@@ -1,11 +1,11 @@
 
 import express from 'express';
 import { userSchema, validate } from '../validations/index.ts';
-import { registerController } from '../controllers/authControllers.ts';
+import { getOneUser, loginController, registerController } from '../controllers/auth.controller.ts';
 
 export const authRouter = express.Router();
 
 
-authRouter.post("/register",validate(userSchema),registerController )
-// authRouter.post("/login",)
-// authRouter.get("/:id",)
+authRouter.post("/register",registerController )
+authRouter.post("/login",loginController)
+authRouter.get("/:id",getOneUser)
