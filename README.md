@@ -1,84 +1,161 @@
-# Turborepo starter
 
-This Turborepo starter is maintained by the Turborepo core team.
+# 📘 SubTrack: Subscription Management for Startups & Freelancers
 
-## Using this example
+## Overview
 
-Run the following command:
+**SubTrack** is a modern SaaS tool built to help freelancers, startups, and small businesses manage their recurring subscriptions efficiently. From tracking billing cycles to forecasting budgets, SubTrack delivers smart analytics and clean UX to help you stay on top of your finances.
 
-```sh
-npx create-turbo@latest
-```
+This documentation is maintained in a Turborepo structure using a dedicated Next.js `docs` app.
 
-## What's inside?
+---
 
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
+## 🔧 Project Structure
 
 ```
-cd my-turborepo
-pnpm build
+subtrack/
+├── apps/
+│   ├── web/                  # Next.js frontend app
+│   ├── gateway/              # API gateway (aggregator for microservices)
+│   ├── docs/                 # Internal documentation site (Next.js)
+│   ├── services/             # All backend microservices
+│   │   ├── auth/             # Auth service (JWT, OAuth, sessions)
+│   │   ├── subscriptions/    # Core logic: add/edit/delete subs
+│   │   ├── billing/          # Stripe sync logic
+│   │   ├── users/            # Profile, onboarding, roles
+│   │   └── notifications/    # Reminders, emails
+│
+├── packages/
+│   ├── ui/                   # Shared components (shadcn, tailwind)
+│   ├── lib/                  # Utilities, hooks, formatting helpers
+│   ├── config/               # Global constants, env handling
+│   ├── types/                # Global TS types
+│   └── prisma/               # Shared DB schema and client setup
+│
+├── .github/                  # GitHub Actions, workflows
+├── .env                      # Root env for local dev
+├── turbo.json                # Turborepo pipeline config
+├── package.json              # Monorepo-level scripts + dependencies
+└── README.md                 # Main project overview
+
+
+
 ```
 
-### Develop
+---
 
-To develop all apps and packages, run the following command:
+## 📌 MVP Scope
 
-```
-cd my-turborepo
+### Core Features
+
+1. **User Authentication**
+   - Email + Google Sign In
+   - Roles: Freelancer, Startup, Business
+
+2. **Subscription Management**
+   - Manual & Integrated entries
+   - Custom tags, categories, billing cycles
+
+3. **Smart Dashboard**
+   - Spend insights
+   - Billing reminders
+   - Usage analytics
+
+4. **Budgeting & Forecasting**
+   - Monthly limits
+   - Burn rate prediction
+
+5. **Analytics & Reports**
+   - Visual insights
+   - Exportable data
+
+6. **Stripe Integration**
+   - Auto-fetch subscriptions
+
+7. **Admin Settings**
+   - Timezone, currency
+   - API keys management
+
+---
+
+## 💡 Tech Stack
+
+| Layer        | Stack                            |
+|--------------|----------------------------------|
+| Frontend     | Next.js, TailwindCSS, SWR        |
+| Backend      | Node.js, Express, tRPC (optional)|
+| Auth         | Clerk/Auth.js / Custom JWT       |
+| DB           | PostgreSQL + Prisma              |
+| DevOps       | Docker, Turborepo, Vercel        |
+| Docs         | Next.js (in `/apps/docs`)        |
+
+---
+
+## 🛠 Development Guide
+
+### Prerequisites
+
+- Node.js (v18+)
+- pnpm
+- Docker
+- PostgreSQL
+- Stripe account (test keys)
+
+### Setup
+
+```bash
+pnpm install
 pnpm dev
 ```
 
-### Remote Caching
+Set up `.env` files across:
+- apps/frontend/.env
+- apps/gateway/.env
+- packages/auth/.env
+- and so on...
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+---
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+## 🧭 Roadmap
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+> Tracked in `docs/roadmap.md` and GitHub Projects
 
-```
-cd my-turborepo
-npx turbo login
-```
+### Phase 1 (Week 1–4)
+- [ ] Project setup & planning
+- [ ] Auth + user role logic
+- [ ] Subscriptions module
+- [ ] Dashboard UI
+- [ ] Stripe test integration
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+### Phase 2 (Week 5–8)
+- [ ] Forecasting engine
+- [ ] Analytics module
+- [ ] Polish & UX
+- [ ] Prepare for launch
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+---
 
-```
-npx turbo link
-```
+## 📁 Docs Directory (Next.js App)
 
-## Useful Links
+Each section of the documentation is a separate route/page:
+- `/intro` – Introduction
+- `/setup` – Environment setup
+- `/architecture` – System design
+- `/roadmap` – Project milestones
+- `/api` – API contracts (OpenAPI/TRPC)
+- `/dev-notes` – Contributions & changelog
 
-Learn more about the power of Turborepo:
+---
 
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+## 👨‍💻 Contribution Guide
+
+- Follow Turborepo structure
+- Lint: `pnpm lint`
+- Format: `pnpm format`
+- Each feature lives in a dedicated branch
+- PRs must have attached issue or task
+
+---
+
+## 📬 Contact
+
+abdulrahmansoyooye.vercel.app/contact
