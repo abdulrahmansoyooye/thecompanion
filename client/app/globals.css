@@ -1,0 +1,149 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap");
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ===========================
+   DESIGN TOKENS (LIGHT MODE)
+=========================== */
+:root {
+  /* Brand */
+  --primary: oklch(0.68 0.18 255); /* soft sky blue */
+  --primary-soft: oklch(0.92 0.05 255);
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(
+    135deg,
+    oklch(0.72 0.17 255),
+    oklch(0.78 0.15 300)
+  );
+
+  --gradient-soft: linear-gradient(
+    180deg,
+    oklch(0.99 0.01 250),
+    oklch(0.96 0.03 250)
+  );
+
+  /* Surfaces */
+  --background: oklch(0.99 0 0);
+  --foreground: oklch(0.18 0 0);
+  --card: oklch(1 0 0);
+  --muted: oklch(0.97 0 0);
+
+  /* UI */
+  --border: oklch(0.85 0.02 250 / 40%);
+  --ring: oklch(0.72 0.15 255);
+  --radius: 0.75rem;
+
+  /* Sidebar */
+  --sidebar: oklch(0.98 0 0);
+}
+
+/* ===========================
+   DARK MODE (SOFT, NOT HARSH)
+=========================== */
+.dark {
+  --background: oklch(0.15 0 0);
+  --foreground: oklch(0.97 0 0);
+  --card: oklch(0.22 0 0);
+  --muted: oklch(0.26 0 0);
+  --primary: oklch(0.78 0.15 260);
+  --border: oklch(1 0 0 / 12%);
+}
+
+/* ===========================
+   BASE
+=========================== */
+body {
+  font-family: "Bricolage Grotesque", sans-serif;
+  background: var(--background);
+  color: var(--foreground);
+  transition: background-color 0.4s ease, color 0.3s ease;
+}
+
+main {
+  @apply mx-auto max-w-[1400px] px-14 pt-10 pb-6
+         flex flex-col gap-8
+         max-sm:px-3;
+}
+
+h1 {
+  @apply text-3xl font-bold tracking-tight;
+}
+
+/* ===========================
+   COMPONENTS
+=========================== */
+@layer components {
+  /* Cards */
+  .companion-card {
+    @apply flex flex-col gap-5 p-5 rounded-3xl bg-white
+           transition-all duration-300
+           hover:shadow-lg;
+    border: 1px solid var(--border);
+  }
+
+  /* Buttons */
+  .btn-primary {
+    background: var(--gradient-primary);
+    @apply text-white px-5 py-2.5 rounded-xl
+           flex items-center gap-2
+           transition-all duration-300
+           hover:scale-[1.03]
+           hover:shadow-lg hover:shadow-indigo-400/30;
+  }
+
+  .btn-outline {
+    @apply px-4 py-2 rounded-xl text-sm
+           transition hover:bg-black/5;
+    border: 1px solid var(--border);
+  }
+
+  /* CTA */
+  .cta-section {
+    background: var(--gradient-primary);
+    @apply rounded-3xl px-8 py-10
+           text-white text-center
+           shadow-xl shadow-indigo-500/20;
+  }
+
+  /* Badges */
+  .subject-badge {
+    background: var(--primary-soft);
+    @apply text-sm px-3 py-1 rounded-full text-gray-700;
+  }
+
+  /* Inputs */
+  .input {
+    @apply w-full rounded-xl px-4 py-2 bg-white
+           focus:outline-none focus:ring-2;
+    border: 1px solid var(--border);
+  }
+
+  /* Sections */
+  .companion-section {
+    background: var(--gradient-soft);
+    @apply rounded-2xl p-6 flex flex-col items-center gap-4;
+    border: 1px solid var(--border);
+  }
+
+  /* Transcript fade */
+  .transcript-fade {
+    @apply pointer-events-none absolute bottom-0 left-0 right-0
+           h-40 bg-gradient-to-t
+            ;
+  }
+}
+
+/* ===========================
+   UTILITIES
+=========================== */
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+}
