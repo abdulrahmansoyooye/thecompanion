@@ -1,40 +1,65 @@
-// import Credentials from "@auth/core/providers/credentials";
 import NextAuth from "next-auth";
+import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
-export const { handlers, signIn, signOut, auth } = NextAuth({
-  providers: [
-    Google,
-    Google({
-      clientId: process.env.AUTH_GOOGLE_ID,
-      clientSecret: process.env.AUTH_GOOGLE_SECRET,
-    }),
-  ],
+
+export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: "jwt" },
+  providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!
+    }),
+
+    Credentials({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        if (!credentials) return null;
+
+
+        const res = await fetch(`${process.env.BACKEND_API_URL}/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: credentials.email,
+            password: credentials.password,
+          })
+        })
+
+        if (!res.ok) {
+          return null
+        }
+
+        const user = await res.json();
+
+        return {
+          id:user.id,
+          email:user.email,
+          name:user.name,
+          role:user.role
+        }
+      }
+    },
+
+    )
+  ],
+
   callbacks: {
-    async jwt({ token, account }) {
-      if (account?.id_token) token.idtoken = account.id_token;
-      return token;
+    async jwt({ user, token }) {
+      if (user) {
+        token.id = user.id
+      }
+      return token
     },
-    async session({ session, token }) {
-      session.idtoken = token.idtoken;
-      return session;
-    },
-  },
-});
+    async session({ token, session }) {
+      if (token && session.user) {
+        session.user.id = token.id as string
 
-// Credentials({
-//     name:"Credentials",
-//     credentials:{
-//         email:{label:"Email",type:"text"},
-//         password:{lable:"Password",type:"password"}
-//     },
-//     async authorize(credentials){
-//         const res = await fetch({});
-
-//      const user =    await res.json();
-
-//      if(res.ok && user) return user;
-//      throw new Error("Invalid login")
-
-//     }
-// })
+      }
+      return session
+    }
+  }
+})

@@ -76,7 +76,7 @@ export const EmailForm: React.FC<EmailFormProps> = ({
       </div>
       <button
         type="submit"
-        disabled={!isValid || isLoading}
+        disabled={isLoading}
         className="text-white text-center text-sm font-semibold leading-5 relative gap-2.5 self-stretch cursor-pointer bg-[#FE5933] px-2.5 py-3 rounded-[14px] max-md:text-[13px] max-sm:text-xs max-sm:px-2 max-sm:py-2.5 hover:bg-[#E54A2B] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         aria-label="Continue with email"
       >

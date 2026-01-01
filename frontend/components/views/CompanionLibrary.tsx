@@ -1,8 +1,7 @@
-"use client"
-import CompanionCard from '@/components/cards/CompanionCard';
-import { INITIAL_COMPANIONS } from '@/constants/constants';
-import React, { useState } from 'react';
 
+import React, { useState } from 'react';
+import { INITIAL_COMPANIONS } from '../constants';
+import CompanionCard from '../components/CompanionCard';
 
 const CompanionLibrary: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');

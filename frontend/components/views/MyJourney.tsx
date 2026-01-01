@@ -1,6 +1,6 @@
 
-import { RECENT_LESSONS } from '@/constants/constants';
 import React from 'react';
+import { RECENT_LESSONS } from '../constants';
 
 const MyJourney: React.FC = () => {
   return (

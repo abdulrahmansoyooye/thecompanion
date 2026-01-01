@@ -1,4 +1,3 @@
-import { signIn } from 'next-auth/react';
 import React from 'react';
 
 interface GoogleSignInButtonProps {
@@ -11,9 +10,8 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
   disabled = false
 }) => {
   const handleClick = () => {
-    if (!disabled && onClick) {
-      signIn("google",{redirectTo:"/"});
-    }
+    if (disabled) return;
+    if (onClick) onClick();
   };
 
   return (

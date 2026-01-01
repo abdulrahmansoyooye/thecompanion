@@ -65,7 +65,7 @@ export const SignInCard: React.FC<SignInCardProps> = ({
           aria-labelledby="signin-title"
         >
           <SignInHeader
-            title="Sign in to TheCompanionnionnionnion"
+            title="Sign in to The Companion App"
             subtitle="Welcome back! Please sign in to continue"
           />
           

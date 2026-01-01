@@ -1,12 +1,12 @@
-"use client"
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { COLORS } from '../constants';
 
-import Image from "next/image"
-import { COLORS } from '@/constants/constants';
 const ICONS = ['🧠', '🧪', '➗', '⌨️', '📜', '📊', '💬', '🧬', '🎨', '🌍', '♟️', '🔭', '📐', '🧬', '💡', '🚀'];
 
 const CompanionBuilder: React.FC = () => {
+  const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedIcon, setSelectedIcon] = useState(ICONS[0]);
@@ -46,7 +46,7 @@ const CompanionBuilder: React.FC = () => {
       
       // Navigate after the user sees the success state
       setTimeout(() => {
-        // navigate('/library');
+        navigate('/library');
       }, 2500);
     }, 1500);
   };
@@ -92,7 +92,7 @@ const CompanionBuilder: React.FC = () => {
             >
               <div className="w-full h-full rounded-[3rem] overflow-hidden flex items-center justify-center bg-white/50 backdrop-blur-sm">
                 {previewUrl ? (
-                  <Image src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                  <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
                 ) : (
                   <div className="flex flex-col items-center">
                     <span className="text-6xl mb-2 drop-shadow-sm">{selectedIcon}</span>
@@ -216,7 +216,7 @@ const CompanionBuilder: React.FC = () => {
                     <button
                       key={v}
                       type="button"
-                      onClick={() => setFormData({...formData, voiceType: v })}
+                      onClick={() => setFormData({...formData, voiceType: v as any})}
                       className={`flex-1 py-3 rounded-xl border text-sm font-medium transition-all ${formData.voiceType === v ? 'bg-[#2D2D2D] text-white border-[#2D2D2D]' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
                     >
                       {v}
@@ -229,7 +229,7 @@ const CompanionBuilder: React.FC = () => {
                 <select 
                   className={inputClass}
                   value={formData.speakingStyle}
-                  onChange={(e) => setFormData({...formData, speakingStyle: e.target.value })}
+                  onChange={(e) => setFormData({...formData, speakingStyle: e.target.value as any})}
                 >
                   <option>Formal</option>
                   <option>Casual</option>

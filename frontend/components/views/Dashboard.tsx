@@ -1,8 +1,8 @@
 
 import React from 'react';
-import Link from 'next/link';
-import CompanionCard from '@/components/cards/CompanionCard';
-import { INITIAL_COMPANIONS, RECENT_LESSONS } from '@/constants/constants';
+import { Link } from 'react-router-dom';
+import { INITIAL_COMPANIONS, RECENT_LESSONS } from '../constants';
+import CompanionCard from '../components/CompanionCard';
 
 const Dashboard: React.FC = () => {
   const featuredCompanions = INITIAL_COMPANIONS.slice(0, 3);
@@ -80,7 +80,7 @@ const Dashboard: React.FC = () => {
           </div>
 
           <Link 
-            href="/builder"
+            to="/builder"
             className="w-full bg-[#FF5B37] hover:bg-[#e64d2b] text-white font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-orange-500/20 flex items-center justify-center gap-2"
           >
             <span className="text-xl">+</span>
