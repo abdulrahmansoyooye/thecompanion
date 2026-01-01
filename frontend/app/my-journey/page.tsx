@@ -6,28 +6,28 @@ const MyJourney: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-8 py-10">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-6 ">
           <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center text-3xl">👤</div>
           <div>
             <h1 className="text-3xl font-extrabold text-gray-900">Adrian Hajdin</h1>
             <p className="text-gray-500 font-medium">adrian@jsmastery.pro</p>
           </div>
         </div>
-
+       
         <div className="flex gap-4">
           <div className="bg-white border border-gray-200 p-6 rounded-[2rem] shadow-sm flex items-center gap-4 min-w-[200px]">
             <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500 border border-orange-100">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
             </div>
             <div>
               <div className="text-2xl font-bold">23</div>
               <div className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Lessons Completed</div>
             </div>
           </div>
-          
+
           <div className="bg-white border border-gray-200 p-6 rounded-[2rem] shadow-sm flex items-center gap-4 min-w-[200px]">
             <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-[#FF5B37] border border-red-100">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z" /><path d="M6 12v5c3 3 9 3 12 0v-5" /></svg>
             </div>
             <div>
               <div className="text-2xl font-bold">10</div>
@@ -39,7 +39,7 @@ const MyJourney: React.FC = () => {
 
       <div className="bg-white border border-gray-200 rounded-[2.5rem] p-10 shadow-sm">
         <h2 className="text-2xl font-bold mb-8">Completed lessons</h2>
-        
+
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
