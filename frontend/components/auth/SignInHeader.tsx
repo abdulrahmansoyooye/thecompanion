@@ -28,6 +28,6 @@ export const SignInHeader: React.FC<SignInHeaderProps> = ({
       <p className="self-stretch text-[#111] text-center text-sm font-normal leading-5 relative max-md:text-[13px] max-md:leading-[18px] max-sm:text-xs max-sm:leading-4">
         {subtitle}
       </p>
-    </header>
+    </header>  
   );
 };
