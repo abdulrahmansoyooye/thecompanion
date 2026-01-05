@@ -14,16 +14,21 @@ export const metadata: Metadata = {
   description: "Real-time AI Conversation Platform For Students And Developers",
 };
 
-export default function RootLayout({
+import { auth } from "@/lib/auth";
+import { VapiProvider } from "@/providers/vapi";
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
+
   return (
     <html lang="en">
       <body className={`${bricolage.variable}`}>
-        <Navbar />
-        {children}
+        <Navbar session={session} />
+        <VapiProvider>{children}</VapiProvider>
         {/* <NextAuthProvider>{children}</NextAuthProvider> */}
       </body>
     </html>

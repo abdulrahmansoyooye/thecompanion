@@ -32,7 +32,7 @@ const CompanionCard: React.FC<CompanionCardProps> = ({ companion, compact }) => 
         </div>
         
         <Link 
-          href={`/lesson/${companion.id}`}
+          href={`/companions/${companion.id}`}
           className="block w-full bg-[#FF5B37] text-white font-bold py-3 rounded-xl text-center hover:bg-[#e64d2b] transition-colors"
         >
           Launch Lesson

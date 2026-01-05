@@ -7,30 +7,39 @@ import {
   Compass,
   LogIn,
   Menu,
+  LogOut,
+  User,
 } from "lucide-react";
 import { useState } from "react";
+import { signOut } from "next-auth/react";
 
 const navItems = [
   { label: "Home", href: "/", icon: Home },
   { label: "Companion", href: "/companions", icon: Sparkles },
   { label: "My Journey", href: "/my-journey", icon: Compass },
-  { label: "Sign In", href: "/sign-in", icon: LogIn },
 ];
 
-const Navbar = () => {
+interface NavbarProps {
+  session: any;
+}
+
+const Navbar = ({ session }: NavbarProps) => {
   const [open, setOpen] = useState(false);
+  const user = session?.user;
 
   return (
     <nav className="navbar relative">
       {/* Logo */}
-    <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-[#FF5B37] rounded-lg flex items-center justify-center text-white font-bold">TC</div>
-          <span className="font-bold text-xl tracking-tight">The Companion</span>
-        </Link>
+      <Link href="/" className="flex items-center gap-2">
+        <div className="w-8 h-8 bg-[#FF5B37] rounded-lg flex items-center justify-center text-white font-bold">
+          TC
+        </div>
+        <span className="font-bold text-xl tracking-tight">The Companion</span>
+      </Link>
 
       {/* Desktop Navigation */}
       <div className="hidden md:flex items-center gap-6">
-        {navItems.slice(0, 3).map((item) => (
+        {navItems.map((item) => (
           <Link
             key={item.label}
             href={item.href}
@@ -40,9 +49,37 @@ const Navbar = () => {
           </Link>
         ))}
 
-        <Link href="/sign-in" className="btn-signin">
-          Sign In
-        </Link>
+        {user ? (
+          <div className="flex items-center gap-4 pl-4 border-l border-black/10">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-black/5 rounded-full flex items-center justify-center overflow-hidden">
+                {user.image ? (
+                  <img
+                    src={user.image}
+                    alt={user.name || "User"}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <User size={16} />
+                )}
+              </div>
+              <span className="text-sm font-medium">
+                {user.name?.split(" ")[0] || "User"}
+              </span>
+            </div>
+            <button
+              onClick={() => signOut()}
+              className="text-sm font-medium hover:opacity-70 transition flex items-center gap-1 text-red-600"
+              title="Sign Out"
+            >
+              <LogOut size={16} />
+            </button>
+          </div>
+        ) : (
+          <Link href="/sign-in" className="btn-signin">
+            Sign In
+          </Link>
+        )}
       </div>
 
       {/* Mobile Controls */}
@@ -75,6 +112,53 @@ const Navbar = () => {
                 </Link>
               );
             })}
+
+            {user ? (
+              <>
+                <div className="px-4 py-3 bg-black/5">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center border border-black/10 overflow-hidden">
+                      {user.image ? (
+                        <img
+                          src={user.image}
+                          alt={user.name || "User"}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <User size={16} />
+                      )}
+                    </div>
+                    <div className="overflow-hidden min-w-0">
+                      <p className="text-sm font-medium truncate">
+                        {user.name || "User"}
+                      </p>
+                      <p className="text-xs text-black/50 truncate">
+                        {user.email}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setOpen(false);
+                    signOut();
+                  }}
+                  className="flex items-center gap-3 px-4 py-3 text-sm hover:bg-black/5 transition text-red-600 w-full text-left font-medium"
+                >
+                  <LogOut size={18} />
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/sign-in"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 text-sm hover:bg-black/5 transition font-medium"
+              >
+                <LogIn size={18} />
+                Sign In
+              </Link>
+            )}
           </div>
         </div>
       )}
