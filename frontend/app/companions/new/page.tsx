@@ -4,7 +4,9 @@ import React, { useState, useRef } from 'react';
 
 import Image from "next/image"
 import { COLORS } from '@/constants/constants';
-const ICONS = ['🧠', '🧪', '➗', '⌨️', '📜', '📊', '💬', '🧬', '🎨', '🌍', '♟️', '🔭', '📐', '🧬', '💡', '🚀'];
+import { CreateCompanion } from '@/services/companion.services';
+
+const ICONS = ['🧠', '🧪', '➗', '⌨️', '📜', '📊', '💬', '🎨', '🌍', '♟️', '🔭', '📐', '🧬', '💡', '🚀'];
 
 const CompanionBuilder: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -35,20 +37,13 @@ const CompanionBuilder: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+    await CreateCompanion(formData);
     // Simulate a brief generation delay for effect
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setShowSuccess(true);
-      
-      // Navigate after the user sees the success state
-      setTimeout(() => {
-        // navigate('/library');
-      }, 2500);
-    }, 1500);
+    
+    
   };
 
   const inputClass = "w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FF5B37]/20 placeholder-gray-400 transition-all";
@@ -116,9 +111,9 @@ const CompanionBuilder: React.FC = () => {
               <div>
                 <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-4">Choose an Icon</label>
                 <div className="grid grid-cols-4 gap-3">
-                  {ICONS.map(icon => (
+                  {ICONS.map((icon,i) => (
                     <button
-                      key={icon}
+                      key={`${icon}-${i}`}
                       type="button"
                       onClick={() => setSelectedIcon(icon)}
                       className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all ${selectedIcon === icon ? 'bg-[#FF5B37] text-white scale-110 shadow-lg' : 'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}

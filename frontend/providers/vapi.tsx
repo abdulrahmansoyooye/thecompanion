@@ -4,11 +4,7 @@ import { useEffect } from "react"
 
 export const VapiProvider = ({children}: {children: React.ReactNode}) => {
 
-    useEffect(()=>{
-        return () => {
-            vapi.stop()
-        }
-    },[])
+    
     return (
         <>
             {children}

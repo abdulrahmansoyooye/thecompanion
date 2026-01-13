@@ -3,6 +3,7 @@ import { RECENT_LESSONS } from '@/constants/constants';
 import React from 'react';
 
 const MyJourney: React.FC = () => {
+  
   return (
     <div className="max-w-7xl mx-auto px-8 py-10">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">

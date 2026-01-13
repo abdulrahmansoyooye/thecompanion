@@ -1,10 +1,12 @@
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
+import React, { useState } from 'react';
 import CompanionCard from '@/components/cards/CompanionCard';
 import { INITIAL_COMPANIONS, RECENT_LESSONS } from '@/constants/constants';
+import CreateCompanionModal from '@/components/modals/CreateCompanionModal';
 
 const Dashboard: React.FC = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const featuredCompanions = INITIAL_COMPANIONS.slice(0, 3);
 
   return (
@@ -22,7 +24,7 @@ const Dashboard: React.FC = () => {
         {/* Recently Completed */}
         <div className="lg:col-span-2 bg-white border border-gray-200 rounded-[2.5rem] p-8 shadow-sm">
           <h2 className="text-xl font-bold mb-6">Recently completed lessons</h2>
-          
+
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
@@ -61,16 +63,16 @@ const Dashboard: React.FC = () => {
         <div className="bg-[#2D2D2D] rounded-[2.5rem] p-10 flex flex-col items-center text-center text-white relative overflow-hidden h-full">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full -ml-24 -mb-24 blur-3xl"></div>
-          
+
           <span className="bg-[#FCD34D] text-[#854D0E] font-bold text-[10px] px-4 py-1.5 rounded-full uppercase tracking-widest mb-6">
             Start learning your way
           </span>
-          
+
           <h2 className="text-2xl font-bold mb-4">Build a Personalized Learning Companion</h2>
           <p className="text-gray-400 text-sm mb-8 leading-relaxed">
             Pick a name, subject, voice, & personality — and start learning through voice conversations that feel natural and fun.
           </p>
-          
+
           <div className="grid grid-cols-3 gap-6 mb-8 w-full max-w-xs">
             {['🧪', '➗', '⌨️', '📜', '📊', '💬'].map((icon, idx) => (
               <div key={idx} className="bg-white/10 w-12 h-12 rounded-2xl flex items-center justify-center text-xl hover:scale-110 transition-transform cursor-pointer">
@@ -79,15 +81,20 @@ const Dashboard: React.FC = () => {
             ))}
           </div>
 
-          <Link 
-            href="/builder"
-            className="w-full bg-[#FF5B37] hover:bg-[#e64d2b] text-white font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-orange-500/20 flex items-center justify-center gap-2"
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="w-full bg-[#FF5B37] hover:bg-[#e64d2b] text-white font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-orange-500/20 flex items-center justify-center gap-2 cursor-pointer"
           >
             <span className="text-xl">+</span>
             Build New Companion
-          </Link>
+          </button>
         </div>
       </div>
+
+      <CreateCompanionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 };

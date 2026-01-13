@@ -12,7 +12,7 @@ declare global {
             )=> Response;
         }
         interface Request {
-            user?: {userId: string, role: string, email:string},
+            user?: {userId: string,email:string},
            
         }
         

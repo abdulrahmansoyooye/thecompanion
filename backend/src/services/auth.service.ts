@@ -1,47 +1,81 @@
-import { AppError } from "../lib/errors/AppError.ts";
-import { prisma } from "../lib/prisma.ts"
-import bcrypt from "bcrypt"
-import { generateAcessToken } from "../utils/index.ts";
+import { AppError } from "../lib/errors/AppError.js";
+import { prisma } from "../lib/prisma.js";
+import bcrypt from "bcrypt";
+import { generateAcessToken } from "../utils/index.js";
+
 export const AuthService = {
-    register: async (email: string, passowrd: string, role: string) => {
+    register: async (email: string, password: string, role: string) => {
         const existingUser = await prisma.user.findUnique({ where: { email } });
 
-        if (existingUser) throw new AppError("Email already registered", 400, "EMAIL_REGISTERED");
+        if (existingUser) {
+            throw new AppError("Email already registered", 400, "EMAIL_REGISTERED");
+        }
 
-        const passwordHash = await bcrypt.hash(passowrd, 10);
-        const user =await prisma.user.create({
+        const passwordHash = await bcrypt.hash(password, 10);
+        const user = await prisma.user.create({
             data: {
                 email,
                 passwordHash,
-                role
+                googleId: "", // Or make it optional in schema
             }
-        })
+        });
 
-
-        const token = await generateAcessToken(user)
-        return { user: { id: ( user).id, email: ( user).email, role: ( user).role }, token }
-
+        const token = await generateAcessToken(user);
+        return {
+            user: { id: user.id, email: user.email },
+            token
+        };
     },
 
-      login: async (email: string, passowrd: string,) => {
-        const user =await  prisma.user.findUnique({ where: { email } });
+    login: async (email: string, password: string) => {
+        const user = await prisma.user.findUnique({ where: { email } });
 
+        if (!user || !user.passwordHash) {
+            throw new AppError("Invalid email or password", 401, "AUTH_FAILED");
+        }
 
-        if (!user) throw new AppError("Invalid email", 401, "AUTH_FAILED");
+        const isPasswordCorrect = await bcrypt.compare(password, user.passwordHash);
+        if (!isPasswordCorrect) {
+            throw new AppError("Invalid email or password", 401, "AUTH_FAILED");
+        }
 
-        const ok = await bcrypt.compare(passowrd, user.passwordHash);
-        if (!ok) throw new AppError("Invalid password", 401, "AUTH_FAILED");
-        
-
-
-        const token = await generateAcessToken(user)
-        return { user: { id: ( user).id, email: ( user).email, role: ( user).role }, token }
+        const token = await generateAcessToken(user);
+        return {
+            user: { id: user.id, email: user.email },
+            token
+        };
     },
-    me: async (userId:string ) => {
-        const user = await prisma.user.findUnique({ where: { id:userId } });
 
-        if (!user) throw new AppError("User not found", 404, "NOT_FOUND");
+    me: async (userId: string) => {
+        const user = await prisma.user.findUnique({ where: { id: userId } });
 
-        return { user: { id: ( user).id, email: ( user).email, role: ( user).role }}
+        if (!user) {
+            throw new AppError("User not found", 404, "NOT_FOUND");
+        }
+
+        return {
+            user: { id: user.id, email: user.email }
+        };
+    },
+
+    googleSync: async (email: string) => {
+        let user = await prisma.user.findUnique({ where: { email } });
+
+        if (!user) {
+            user = await prisma.user.create({
+                data: {
+                    email,
+                    passwordHash: "",
+                    googleId: "", // Should be updated with real googleId if available
+                }
+            });
+        }
+
+        const token = await generateAcessToken(user);
+        return {
+            user: { id: user.id, email: user.email },
+            token
+        };
     }
-}
+};
+

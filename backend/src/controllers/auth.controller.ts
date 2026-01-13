@@ -1,33 +1,36 @@
-import { Request, Response } from "express"
-import { asyncHandler } from "../lib/asyncHandler.ts"
-import { AuthService } from "../services/auth.service.ts"
+import { Request, Response } from "express";
+import { asyncHandler } from "../lib/asyncHandler.js";
+import { AuthService } from "../services/auth.service.js";
+import { AppError } from "../lib/errors/AppError.js";
 
-export const registerController = asyncHandler(
-   async(req:Request,res:Response) => {
-      const {email,password,role} = req.body
+export const registerController = asyncHandler(async (req: Request, res: Response) => {
+   const { email, password, role } = req.body;
+   if (!email || !password) throw new AppError("Email and password are required", 400, "MISSING_FIELDS");
 
-      const user = await AuthService.register(email,password,role)
+   const result = await AuthService.register(email, password, role);
+   return res.sendMessage(201, true, "User successfully registered", result);
+});
 
-      res.sendMessage(200,true,"User sucessfully Registered",user)
-   }
-)
+export const loginController = asyncHandler(async (req: Request, res: Response) => {
+   const { email, password } = req.body;
+   if (!email || !password) throw new AppError("Email and password are required", 400, "MISSING_FIELDS");
 
-export const loginController = asyncHandler(
-   async(req:Request,res:Response) => {
-      const {email,password} = req.body
+   const result = await AuthService.login(email, password);
+   return res.sendMessage(200, true, "User logged in successfully", result);
+});
 
-      const user = await AuthService.login(email,password)
+export const googleSyncController = asyncHandler(async (req: Request, res: Response) => {
+   const user = req.user;
+   if (!user || !user.email) throw new AppError("Google authentication failed", 401, "AUTH_FAILED");
 
-      res.sendMessage(200,true,"User logged In Successfully",user)
-   }
-)
+   const result = await AuthService.googleSync(user.email);
+   return res.sendMessage(200, true, "User synced with Google successfully", result);
+});
 
-export const getOneUser = asyncHandler(
-   async(req:Request,res:Response) => {
-      const userId = req.user!.userId
+export const getOneUser = asyncHandler(async (req: Request, res: Response) => {
+   const userId = req.user?.userId;
+   if (!userId) throw new AppError("Authentication required", 401, "UNAUTHORIZED");
 
-      const user = await AuthService.me(userId)
-
-      res.sendMessage(200,true,"User fetched Successfully",user)
-   }
-)
+   const result = await AuthService.me(userId);
+   return res.sendMessage(200, true, "User fetched successfully", result);
+});

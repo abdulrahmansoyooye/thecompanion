@@ -11,8 +11,8 @@ datasource db {
 model User {
   id            String         @id @default(cuid())
   email         String         @unique
-  passwordHash  String
-  role          String
+  passwordHash  String?
+  googleId      String?
   createdAt     DateTime       @default(now())
   companions    Companion[]
   conversations Conversation[]
@@ -22,10 +22,12 @@ model Companion {
   id            String         @id @default(cuid())
   userId        String
   name          String
+  icon          String
+  iconImage     String
   topic         String
   voiceType     String
   style         String
-  langauge      String
+  language      String
   mode          String
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
@@ -37,32 +39,25 @@ model Conversation {
   id          String    @id @default(cuid())
   userId      String
   companionId String
-  messages    Message[]
+  createdAt   DateTime  @default(now())
   companion   Companion @relation(fields: [companionId], references: [id])
   User        User      @relation(fields: [userId], references: [id])
+  messages    Message[]
 }
 
 model Message {
-  id   String      @id @default(cuid())
-  from MessageFrom
-  type MessageType
-
-  content        String
+  id             String       @id @default(cuid())
   conversationId String
-  converasation  Conversation @relation(fields: [conversationId], references: [id])
-
-  createdAt DateTime
+  role           String       // 'user' or 'assistant'
+  content        String
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 }
 
-enum MessageFrom {
-  user
-  comapanion
-}
 
-enum MessageType {
-  text
-  voice
-}
+
+
+
 
   
 

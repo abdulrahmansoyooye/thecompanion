@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { INITIAL_COMPANIONS } from '@/constants/constants';
 import { vapi } from '@/lib/vapi';
 import { Loader2, Mic, MicOff, Phone, PhoneOff, RotateCcw } from 'lucide-react';
+import { CreateAssistantDTO } from '@vapi-ai/web/dist/api';
 
 enum CallStatus {
   INACTIVE = "INACTIVE",
@@ -11,7 +12,32 @@ enum CallStatus {
   ACTIVE = "ACTIVE",
   FINISHED = "FINISHED",
 }
-
+const getAssistantConfig = (companion: any): CreateAssistantDTO => ({
+  name: companion.name,
+  firstMessage: `Hello, I'm ${companion.name}. Let's discuss ${companion.topic}.`,
+  transcriber: {
+    provider: "deepgram",
+    model: "nova-2",
+    language: "en-US",
+  },
+  voice: {
+    provider: "11labs",
+    voiceId: "21m00Tcm4TlvDq8ikWAM", // Standard 'Rachel' voice, highly reliable
+  },
+  model: {
+    provider: "openai",
+    model: "gpt-3.5-turbo",
+    messages: [
+      {
+        role: "system",
+        content: `You are a tutor.
+                  Topic: ${companion.topic}
+                  Subject: ${companion.subject}
+                  Keep responses short and conversational.`,
+      },
+    ],
+  },
+});
 interface SavedMessage {
   role: string;
   content: string;
@@ -81,9 +107,11 @@ const LessonRoom: React.FC = () => {
   const handleStart = async () => {
     setCallStatus(CallStatus.CONNECTING);
     try {
-      await vapi.start("106bf23a-f435-46aa-b22c-a0b4d4cf5636"); // Replace with dynamic Assistant ID if needed
-    } catch (err) {
-      console.error("Failed to start call:", err);
+      console.log("Starting Vapi session...");
+      const assistantConfig = getAssistantConfig(companion);
+      await vapi.start(assistantConfig);
+    } catch (err: any) {
+      console.error("Failed to start call catch block:", err);
       setCallStatus(CallStatus.INACTIVE);
     }
   };
@@ -183,8 +211,8 @@ const LessonRoom: React.FC = () => {
           <button
             onClick={toggleCall}
             className={`w-full font-bold py-5 rounded-2xl transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2 ${callStatus === CallStatus.ACTIVE || callStatus === CallStatus.CONNECTING
-                ? 'bg-red-500 hover:bg-red-600 text-white'
-                : 'bg-[#FF5B37] hover:bg-[#e64d2b] text-white'
+              ? 'bg-red-500 hover:bg-red-600 text-white'
+              : 'bg-[#FF5B37] hover:bg-[#e64d2b] text-white'
               }`}
           >
             {callStatus === CallStatus.ACTIVE || callStatus === CallStatus.CONNECTING ? (
