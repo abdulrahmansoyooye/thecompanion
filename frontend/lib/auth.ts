@@ -18,7 +18,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (account?.provider === "google") {
         const token = account.id_token
         try {
-          const res = await fetch(`${process.env.BACKEND_API_URL || "http://127.0.0.1:4000/api/v1"}/auth/google-sync`, {
+          const baseUrl = process.env.BACKEND_API_URL || "http://localhost:4000";
+          const res = await fetch(`${baseUrl}/api/v1/auth/google-sync`, {
             method: "POST",
             headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
           })
@@ -26,9 +27,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             const data = await res.json();
             (user as any).backendToken = data.data.token;
             return true;
+          } else {
+            const errorText = await res.text();
+            console.error("Backend sync failed with status:", res.status, errorText);
+            return false; // Prevent login if sync fails
           }
         } catch (error) {
           console.error("Backend sync failed:", error);
+          return false;
         }
       }
       return true

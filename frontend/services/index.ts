@@ -18,19 +18,27 @@ export async function fetchWithAuth(endpoint: string, options: FetchOptions = {}
     if (!session) {
         throw new Error("Not Authenticated");
     }
-    const idToken = session.backendToken
-    console.log(idToken)
+    const token = session.backendToken || session.idToken;
+    console.log("Using token for request:", token ? "Token present" : "Token missing");
+
     try {
         const response = await fetch(`${API_URL}/api/v1${endpoint}`, {
             method: options.method || "GET",
             headers: {
-                Authorization: `Bearer ${idToken}`,
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
                 ...options.headers
             },
-            body: options.body,
-        })
-return response.body
+            body: options.body ? JSON.stringify(options.body) : undefined,
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || `API request failed with status ${response.status}`);
+        }
+
+        return await response.json();
     } catch (error) {
-       console.log("Api request failed",error)
+        console.log("Api request failed", error)
     }
 }

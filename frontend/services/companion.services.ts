@@ -23,7 +23,7 @@ export async function CreateCompanion(companionData: any) {
 
     return fetchWithAuth("/companions/create", {
         method: "POST",
-        body: JSON.stringify(payload)
+        body: payload
     })
 }
 

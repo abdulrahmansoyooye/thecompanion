@@ -15,10 +15,14 @@ export const requireAuth = asyncHandler((req: Request, res: Response, next: Next
     if (!token) throw new AppError("Malformed Token", 401, "NO_TOKEN");
 
     try {
-        const payload = jwt.verify(token, config.jwtSecret) as any;
+        
+        const payload = jwt.verify(token, config.jwtSecret,{
+      algorithms: ["HS256"],
+    }) as any;
         req.user = { userId: payload.id, email: payload.email };
         next();
     } catch (error) {
+        console.log(error);
         throw new AppError("Invalid or Expired Token", 401, "INVALID_TOKEN");
     }
 });
