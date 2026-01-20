@@ -8,6 +8,7 @@ import { errorMiddleware } from "./middlewares/error.js"
 import { loggerMiddleware } from "./middlewares/logger.middleware.js"
 import { router } from "./routes/index.js"
 import logger from "./lib/logger.js"
+import { checkDatabaseConnection } from "./database/db.ts"
 
 dotenv.config();
 
@@ -31,8 +32,10 @@ app.get("/", (_, res: Response) => {
 // Error handling must be last
 app.use(errorMiddleware);
 
-app.listen(port, () => {
+app.listen(port, async() => {
+    await checkDatabaseConnection()
     logger.info(`Server running on port ${port}`);
 });
 
 
+ 

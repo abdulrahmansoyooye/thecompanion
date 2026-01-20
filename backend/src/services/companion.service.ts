@@ -3,12 +3,12 @@ import { prisma } from "../lib/prisma.js";
 interface CompanionPayload {
    name: string;
    icon: string;
-   iconImage: string;
+   subject: string;
    topic: string;
    voiceType: string;
+   iconColor: string;
    style: string;
-   language: string; // Fix typo from schema if applicable, or keep as is if restricted by DB
-   mode: string;
+   language: string;
 }
 
 export const CompanionService = {

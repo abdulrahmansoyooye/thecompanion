@@ -20,8 +20,10 @@ const CompanionBuilder: React.FC = () => {
     name: '',
     subject: '',
     topic: '',
+    icon:selectedIcon,
+    iconColor:selectedColorKey,
     voiceType: 'Female',
-    speakingStyle: 'Formal',
+    style: 'Formal',
     language: 'English'
   });
 
@@ -40,9 +42,15 @@ const CompanionBuilder: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    await CreateCompanion(formData);
-    // Simulate a brief generation delay for effect
+    try {
+     const res = await CreateCompanion(formData);
+    console.log(res)
+    } catch (error) {
+      console.error(error)
     
+    }finally{
+        setIsSubmitting(false)
+    }
     
   };
 
@@ -223,8 +231,8 @@ const CompanionBuilder: React.FC = () => {
                 <label className={labelClass}>Speaking Tone</label>
                 <select 
                   className={inputClass}
-                  value={formData.speakingStyle}
-                  onChange={(e) => setFormData({...formData, speakingStyle: e.target.value })}
+                  value={formData.style}
+                  onChange={(e) => setFormData({...formData, style: e.target.value })}
                 >
                   <option>Formal</option>
                   <option>Casual</option>

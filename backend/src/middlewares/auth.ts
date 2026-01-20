@@ -15,10 +15,8 @@ export const requireAuth = asyncHandler((req: Request, res: Response, next: Next
     if (!token) throw new AppError("Malformed Token", 401, "NO_TOKEN");
 
     try {
-        
-        const payload = jwt.verify(token, config.jwtSecret,{
-      algorithms: ["HS256"],
-    }) as any;
+
+        const payload = jwt.verify(token, config.jwtSecret) as any;
         req.user = { userId: payload.id, email: payload.email };
         next();
     } catch (error) {
@@ -46,6 +44,7 @@ export const verifyGoogleToken = asyncHandler(async (req: Request, res: Response
         req.user = { userId: payload.sub, email: payload.email! };
         next();
     } catch (error) {
+        console.error("Google Token Verification Error:", error);
         throw new AppError("Google Token Verification Failed", 401, "INVALID_TOKEN");
     }
 });

@@ -15,6 +15,8 @@ export const metadata: Metadata = {
 };
 
 
+import { Providers } from "@/components/providers/SessionProvider";
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -25,8 +27,10 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={`${bricolage.variable}`}>
-        <Navbar session={session} />
-        {children}
+        <Providers session={session}>
+          <Navbar session={session} />
+          {children}
+        </Providers>
       </body>
     </html>
   );

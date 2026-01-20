@@ -5,6 +5,7 @@ import { INITIAL_COMPANIONS } from '@/constants/constants';
 import { vapi } from '@/lib/vapi';
 import { Loader2, Mic, MicOff, Phone, PhoneOff, RotateCcw } from 'lucide-react';
 import { CreateAssistantDTO } from '@vapi-ai/web/dist/api';
+import { toast } from 'sonner';
 
 enum CallStatus {
   INACTIVE = "INACTIVE",
@@ -70,7 +71,12 @@ const LessonRoom: React.FC = () => {
     const onCallEnd = () => setCallStatus(CallStatus.INACTIVE);
     const onSpeechStart = () => setIsSpeaking(true);
     const onSpeechEnd = () => setIsSpeaking(false);
-    const onError = (error: Error) => console.error("Vapi Error:", error);
+    const onError = (error: Error) => {
+      console.error("Vapi Error:", error);
+      toast.error("Vapi Error", {
+        description: error.message || "An error occurred during the call."
+      });
+    };
 
     const onMessage = (message: Message) => {
       if (message.type === "transcript" && message.transcriptType === "final" && message.transcript && message.role) {
@@ -112,6 +118,9 @@ const LessonRoom: React.FC = () => {
       await vapi.start(assistantConfig);
     } catch (err: any) {
       console.error("Failed to start call catch block:", err);
+      toast.error("Failed to start session", {
+        description: "Please check your microphone permissions and try again."
+      });
       setCallStatus(CallStatus.INACTIVE);
     }
   };
@@ -130,43 +139,43 @@ const LessonRoom: React.FC = () => {
   const currentTranscript = messages.length > 0 ? messages[0].content : "Ready to start the lesson...";
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col min-h-[calc(100vh-80px)]">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex flex-col min-h-[calc(100vh-80px)]">
       {/* Top Header Card */}
-      <div className="bg-white border border-gray-300 rounded-3xl px-6 py-4 flex items-center justify-between mb-8 shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl ${companion.color} border-none`}>
+      <div className="bg-white border border-gray-300 rounded-2xl sm:rounded-3xl px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 sm:mb-8 shadow-sm">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center text-2xl sm:text-3xl ${companion.color} border-none shrink-0`}>
             {companion.icon}
           </div>
-          <div>
-            <div className="flex items-center gap-3">
-              <h2 className="text-xl font-bold text-gray-900">{companion.name}</h2>
-              <span className="bg-[#1A1A1A] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 truncate">{companion.name}</h2>
+              <span className="bg-[#1A1A1A] text-white text-[8px] sm:text-[10px] font-bold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full uppercase tracking-wider shrink-0">
                 {companion.subject}
               </span>
             </div>
-            <p className="text-sm text-gray-600">Topic: {companion.topic}</p>
+            <p className="text-xs sm:text-sm text-gray-600 truncate">Topic: {companion.topic}</p>
           </div>
         </div>
-        <div className="text-gray-900 font-bold text-lg">
+        <div className="text-gray-900 font-bold text-base sm:text-lg w-full sm:w-auto flex justify-end">
           {companion.duration}
         </div>
       </div>
 
       {/* Main Grid Content */}
-      <div className="flex-1 grid grid-cols-12 gap-6 mb-8">
+      <div className="flex-1 flex flex-col lg:grid lg:grid-cols-12 gap-6 mb-8">
         {/* Center Companion Focus Area */}
-        <div className="col-span-9 bg-white rounded-2xl flex flex-col items-center justify-center relative overflow-hidden transition-all duration-300">
+        <div className="lg:col-span-9 bg-white rounded-2xl flex flex-col items-center justify-center relative overflow-hidden transition-all duration-300 min-h-[300px] lg:min-h-0 py-10 lg:py-0">
           {/* Active State Border/Glow */}
           {callStatus === CallStatus.ACTIVE && (
             <div className="absolute inset-1 border-2 border-[#FF5B37] rounded-xl pointer-events-none opacity-40 animate-pulse"></div>
           )}
 
           <div className="flex flex-col items-center gap-6">
-            <div className={`w-32 h-32 ${companion.color} rounded-2xl flex items-center justify-center text-6xl shadow-sm border-2 ${isSpeaking ? 'border-[#FF5B37] scale-110' : 'border-blue-400 border-dashed'} transition-all duration-300`}>
+            <div className={`w-24 h-24 sm:w-32 sm:h-32 ${companion.color} rounded-2xl flex items-center justify-center text-5xl sm:text-6xl shadow-sm border-2 ${isSpeaking ? 'border-[#FF5B37] scale-110' : 'border-blue-400 border-dashed'} transition-all duration-300`}>
               {companion.icon}
             </div>
             <div className="px-4 py-1 flex flex-col items-center gap-2">
-              <h3 className="text-2xl font-black text-gray-900">{companion.name}</h3>
+              <h3 className="text-xl sm:text-2xl font-black text-gray-900 text-center">{companion.name}</h3>
               {callStatus === CallStatus.CONNECTING && (
                 <span className="text-sm text-gray-500 flex items-center gap-2">
                   <Loader2 className="animate-spin w-4 h-4" /> Connecting...
@@ -180,28 +189,28 @@ const LessonRoom: React.FC = () => {
         </div>
 
         {/* Sidebar Controls */}
-        <div className="col-span-3 flex flex-col gap-4">
+        <div className="lg:col-span-3 flex flex-col gap-4">
           {/* User Identity Area */}
-          <div className="flex-1 bg-white border-2 border-gray-900 rounded-2xl flex items-center justify-center">
+          <div className="hidden lg:flex flex-1 bg-white border-2 border-gray-900 rounded-2xl items-center justify-center">
             <span className="text-xl font-black text-gray-900">You</span>
           </div>
 
           {/* Action Buttons Grid */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-2 gap-4">
             <button
               onClick={toggleMic}
               disabled={callStatus !== CallStatus.ACTIVE}
               className={`bg-white border-2 border-gray-900 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 transition-colors ${callStatus !== CallStatus.ACTIVE ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50'}`}
             >
-              <div className="text-2xl">
-                {isMicOn ? <Mic /> : <MicOff className="text-red-500" />}
+              <div className="text-xl sm:text-2xl">
+                {isMicOn ? <Mic size={20} /> : <MicOff size={20} className="text-red-500" />}
               </div>
               <span className="text-xs font-bold text-gray-900">{isMicOn ? 'Mute' : 'Unmute'}</span>
             </button>
 
             <button className="bg-white border-2 border-gray-900 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 hover:bg-gray-50 transition-colors">
-              <div className="text-2xl">
-                <RotateCcw />
+              <div className="text-xl sm:text-2xl">
+                <RotateCcw size={20} />
               </div>
               <span className="text-xs font-bold text-gray-900">Repeat</span>
             </button>
@@ -210,18 +219,18 @@ const LessonRoom: React.FC = () => {
           {/* Start/End Lesson Button */}
           <button
             onClick={toggleCall}
-            className={`w-full font-bold py-5 rounded-2xl transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2 ${callStatus === CallStatus.ACTIVE || callStatus === CallStatus.CONNECTING
+            className={`w-full font-bold py-4 sm:py-5 rounded-2xl transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2 ${callStatus === CallStatus.ACTIVE || callStatus === CallStatus.CONNECTING
               ? 'bg-red-500 hover:bg-red-600 text-white'
               : 'bg-[#FF5B37] hover:bg-[#e64d2b] text-white'
               }`}
           >
             {callStatus === CallStatus.ACTIVE || callStatus === CallStatus.CONNECTING ? (
               <>
-                <PhoneOff size={20} /> End Lesson
+                <PhoneOff size={20} /> <span className="text-sm sm:text-base">End Lesson</span>
               </>
             ) : (
               <>
-                <Phone size={20} /> Start Lesson
+                <Phone size={20} /> <span className="text-sm sm:text-base">Start Lesson</span>
               </>
             )}
           </button>
@@ -229,12 +238,12 @@ const LessonRoom: React.FC = () => {
       </div>
 
       {/* Footer Transcription Area */}
-      <div className="flex flex-col items-center justify-center text-center px-12 min-h-[100px]">
-        <p className="text-xl font-bold text-gray-900 mb-2 max-w-3xl transition-all duration-300">
+      <div className="flex flex-col items-center justify-center text-center px-4 sm:px-12 min-h-[100px] mb-6">
+        <p className="text-lg sm:text-xl font-bold text-gray-900 mb-2 max-w-3xl transition-all duration-300 line-clamp-3">
           {currentTranscript}
         </p>
         {messages.length > 1 && (
-          <p className="text-lg font-medium text-gray-400 max-w-3xl line-clamp-1">
+          <p className="text-base sm:text-lg font-medium text-gray-400 max-w-3xl line-clamp-1">
             {messages[1].content}
           </p>
         )}

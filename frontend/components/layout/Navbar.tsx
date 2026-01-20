@@ -11,16 +11,19 @@ import {
   User,
   Plus,
   Bookmark,
+  Settings,
 } from "lucide-react";
 import { useState } from "react";
 import { signOut } from "next-auth/react";
 import CreateCompanionModal from "../modals/CreateCompanionModal";
+import { usePathname } from "next/navigation";
 
 const navItems = [
   { label: "Home", href: "/", icon: Home },
   { label: "Companion", href: "/companions", icon: Sparkles },
   { label: "My Journey", href: "/my-journey", icon: Compass },
   { label: "Bookmarks", href: "/bookmarks", icon: Bookmark },
+  { label: "Settings", href: "/settings", icon: Settings },
 ];
 
 interface NavbarProps {
@@ -31,10 +34,15 @@ const Navbar = ({ session }: NavbarProps) => {
   const [open, setOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const user = session?.user;
+  const pathname = usePathname();
+
+  const isAuthPage = pathname === "/sign-in" || pathname === "/signup";
+
+  if (isAuthPage) return null;
 
   return (
     <>
-      <nav className="navbar relative">
+      <nav className="navbar">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <div className="w-8 h-8 bg-[#FF5B37] rounded-lg flex items-center justify-center text-white font-bold">
@@ -84,7 +92,7 @@ const Navbar = ({ session }: NavbarProps) => {
                 </span>
               </div>
               <button
-                onClick={() => signOut()}
+                onClick={() => signOut({ redirectTo: "/sign-in" })}
                 className="text-sm font-medium hover:opacity-70 transition flex items-center gap-1 text-red-600 cursor-pointer"
                 title="Sign Out"
               >

@@ -15,7 +15,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^6.2.1",
+    "@prisma/adapter-pg": "^7.2.0",
+    "@prisma/client": "7.2.0",
+    "@types/pg": "^8.16.0",
     "axios": "^1.11.0",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.7.0",
@@ -27,6 +29,7 @@
     "google-auth-library": "^10.5.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.1",
+    "pg": "^8.17.1",
     "typescript": "^5.9.2",
     "winston": "^3.19.0",
     "zod": "^4.0.17"
@@ -40,7 +43,7 @@
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.3.0",
     "nodemon": "^3.1.10",
-    "prisma": "^6.2.1",
+    "prisma": "^7.2.0",
     "tsx": "^4.20.5"
   }
 }

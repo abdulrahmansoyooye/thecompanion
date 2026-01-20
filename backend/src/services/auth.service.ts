@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import { generateAcessToken } from "../utils/index.js";
 
 export const AuthService = {
-    register: async (email: string, password: string, role: string) => {
+    register: async (email: string, password: string) => {
         const existingUser = await prisma.user.findUnique({ where: { email } });
 
         if (existingUser) {
@@ -16,7 +16,7 @@ export const AuthService = {
             data: {
                 email,
                 passwordHash,
-                googleId: "", // Or make it optional in schema
+                // Or make it optional in schema
             }
         });
 
@@ -58,7 +58,7 @@ export const AuthService = {
         };
     },
 
-    googleSync: async (email: string) => {
+    googleSync: async (email: string, userId: string) => {
         let user = await prisma.user.findUnique({ where: { email } });
 
         if (!user) {
@@ -66,7 +66,7 @@ export const AuthService = {
                 data: {
                     email,
                     passwordHash: "",
-                    googleId: "", // Should be updated with real googleId if available
+                   
                 }
             });
         }
@@ -76,6 +76,17 @@ export const AuthService = {
             user: { id: user.id, email: user.email },
             token
         };
+    },
+
+    deleteAccount: async (userId: string) => {
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+
+        if (!user) {
+            throw new AppError("User not found", 404, "NOT_FOUND");
+        }
+
+        await prisma.user.delete({ where: { id: userId } });
+        return true;
     }
 };
 

@@ -1,18 +1,15 @@
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
 }
 
 model User {
   id            String         @id @default(cuid())
   email         String         @unique
   passwordHash  String?
-  googleId      String?
   createdAt     DateTime       @default(now())
   companions    Companion[]
   conversations Conversation[]
@@ -23,12 +20,12 @@ model Companion {
   userId        String
   name          String
   icon          String
-  iconImage     String
+  subject       String
   topic         String
   voiceType     String
+  iconColor     String
   style         String
   language      String
-  mode          String
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   user          User           @relation(fields: [userId], references: [id])
@@ -53,11 +50,3 @@ model Message {
   createdAt      DateTime     @default(now())
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 }
-
-
-
-
-
-
-  
-

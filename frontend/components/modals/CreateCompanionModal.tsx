@@ -1,15 +1,17 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X, Sparkles, Wand2, MessageSquare, Mic2, Languages, Trophy } from 'lucide-react';
-import { CreateCompanion } from '@/services/companion.services';
+import { CreateCompanion, updateCompanion } from '@/services/companion.services';
+import { toast } from 'sonner';
 
 interface CreateCompanionModalProps {
   isOpen: boolean;
   onClose: () => void;
+  editData?: any;
 }
 
-const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onClose }) => {
+const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onClose, editData }) => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     name: '',
@@ -18,9 +20,35 @@ const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onC
     voiceType: 'Rachel',
     style: 'Friendly',
     language: 'English',
-    mode: 'Voice',
+    iconColor: "",
     icon: '🧪'
   });
+
+  useEffect(() => {
+    if (editData) {
+      setFormData({
+        name: editData.name || '',
+        topic: editData.topic || '',
+        subject: editData.subject || 'Science',
+        voiceType: editData.voiceType || 'Rachel',
+        style: editData.style || 'Friendly',
+        language: editData.language || 'English',
+        iconColor: editData.iconColor || '',
+        icon: editData.icon || '🧪'
+      });
+    } else {
+      setFormData({
+        name: '',
+        topic: '',
+        subject: 'Science',
+        voiceType: 'Rachel',
+        style: 'Friendly',
+        language: 'English',
+        iconColor: "",
+        icon: '🧪'
+      });
+    }
+  }, [editData, isOpen]);
 
   if (!isOpen) return null;
 
@@ -29,18 +57,30 @@ const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onC
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-   const response = await CreateCompanion(formData);
-    onClose();
+    try {
+      if (editData) {
+        await updateCompanion(editData.id, formData);
+        toast.success("Companion updated successfully!");
+      } else {
+        await CreateCompanion(formData);
+        toast.success("Companion created successfully!");
+      }
+      onClose();
+      // Use standard navigation if possible, but reload is fine for now as per code
+      setTimeout(() => window.location.reload(), 500);
+    } catch (error) {
+      // Error is already toasted in service layer
+    }
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div 
+      <div
         className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={onClose}
       />
-      
+
       {/* Modal Content */}
       <div className="relative w-full max-w-xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
         {/* Header */}
@@ -50,11 +90,11 @@ const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onC
               <Sparkles size={20} />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Create Companion</h2>
-              <p className="text-xs text-gray-500 font-medium">Design your personalized AI tutor</p>
+              <h2 className="text-xl font-bold text-gray-900">{editData ? 'Update' : 'Create'} Companion</h2>
+              <p className="text-xs text-gray-500 font-medium">{editData ? 'Modify your companion details' : 'Design your personalized AI tutor'}</p>
             </div>
           </div>
-          <button 
+          <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
@@ -68,7 +108,7 @@ const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onC
             {/* Step 1: Identity */}
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                <label className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
                   <Wand2 size={16} className="text-[#FF5B37]" />
                   What's their name?
                 </label>
@@ -83,7 +123,7 @@ const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onC
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                <label className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
                   <MessageSquare size={16} className="text-[#FF5B37]" />
                   What will you learn together?
                 </label>
@@ -99,7 +139,7 @@ const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onC
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                  <label className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
                     <Trophy size={16} className="text-[#FF5B37]" />
                     Subject
                   </label>
@@ -112,7 +152,7 @@ const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onC
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                  <label className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
                     <Mic2 size={16} className="text-[#FF5B37]" />
                     Voice
                   </label>
@@ -136,11 +176,10 @@ const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onC
                       key={icon}
                       type="button"
                       onClick={() => setFormData({ ...formData, icon })}
-                      className={`w-12 h-12 flex items-center justify-center text-xl rounded-xl transition-all cursor-pointer ${
-                        formData.icon === icon 
-                        ? 'bg-[#FF5B37] text-white shadow-lg scale-110' 
+                      className={`w-12 h-12 flex items-center justify-center text-xl rounded-xl transition-all cursor-pointer ${formData.icon === icon
+                        ? 'bg-[#FF5B37] text-white shadow-lg scale-110'
                         : 'bg-gray-50 hover:bg-gray-100 text-gray-600'
-                      }`}
+                        }`}
                     >
                       {icon}
                     </button>
@@ -160,9 +199,9 @@ const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onC
             </button>
             <button
               type="submit"
-              className="flex-[2] py-4 px-6 bg-[#FF5B37] hover:bg-[#e64d2b] text-white font-extrabold rounded-2xl transition-all shadow-lg shadow-orange-500/10 active:scale-[0.98] flex items-center justify-center gap-2"
+              className="flex-2 py-4 px-6 bg-[#FF5B37] hover:bg-[#e64d2b] text-white font-extrabold rounded-2xl transition-all shadow-lg shadow-orange-500/10 active:scale-[0.98] flex items-center justify-center gap-2"
             >
-              Create Companion
+              {editData ? 'Update' : 'Create'} Companion
               <Sparkles size={18} />
             </button>
           </div>
