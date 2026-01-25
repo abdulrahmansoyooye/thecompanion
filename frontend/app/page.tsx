@@ -5,24 +5,42 @@ import CompanionCard from '@/components/cards/CompanionCard';
 import { INITIAL_COMPANIONS, RECENT_LESSONS } from '@/constants/constants';
 import CreateCompanionModal from '@/components/modals/CreateCompanionModal';
 import { getAllCompanions } from '../services/companion.services';
+import { Companion } from '@/types/types';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import { CompanionSkeleton } from '@/components/cards/CompanionSkeleton';
+import { TableSkeleton } from '@/components/ui/TableSkeleton';
 
 const Dashboard: React.FC = () => {
+  const { data: session, status } = useSession();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [companions,setCompanions] = useState([])
-  useEffect(()=>{
+  const [companions, setCompanions] = useState<Companion[]>([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useRouter();
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      navigate.push('/sign-in');
+    }
+  }, [status, navigate]);
+
+  useEffect(() => {
     const fetchCompanions = async () => {
       try {
+        setLoading(true);
         const response = await getAllCompanions();
-        
-        console.log(response)
-        setCompanions(response);
+        if (response.data) {
+          setCompanions(response.data);
+        }
       } catch (error) {
         console.error('Error fetching companions:', error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchCompanions();
-  },[])
-  const featuredCompanions = INITIAL_COMPANIONS.slice(0, 3);
+  }, [])
+  const featuredCompanions = companions.slice(0, 3);
 
   return (
     <main className="">
@@ -30,9 +48,27 @@ const Dashboard: React.FC = () => {
 
       {/* Featured Grid */}
       <div className="companions-grid mb-12">
-        {featuredCompanions.map((comp) => (
-          <CompanionCard key={comp.id} companion={comp} />
-        ))}
+        {loading ? (
+          <>
+            <CompanionSkeleton />
+            <CompanionSkeleton />
+            <CompanionSkeleton />
+          </>
+        ) : featuredCompanions.length > 0 ? (
+          featuredCompanions.map((comp) => (
+            <CompanionCard key={comp.id} companion={comp} />
+          ))
+        ) : (
+          <div className="col-span-full py-12 text-center bg-gray-50 rounded-[2.5rem] border border-dashed border-gray-200">
+            <p className="text-gray-500 font-medium">No companions created yet.</p>
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="mt-4 text-[#FF5B37] font-bold hover:underline"
+            >
+              + Create your first companion
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8">
@@ -50,25 +86,39 @@ const Dashboard: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {RECENT_LESSONS.map((lesson) => (
-                  <tr key={lesson.id} className="group hover:bg-gray-50 transition-colors">
-                    <td className="py-5 pr-4 flex items-center gap-4">
-                      <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center text-xl">
-                        {lesson.icon}
-                      </div>
-                      <div>
-                        <div className="font-bold text-gray-900">{lesson.name}</div>
-                        <div className="text-sm text-gray-500">Topic: {lesson.topic}</div>
-                      </div>
+                {loading ? (
+                  <tr>
+                    <td colSpan={3} className="py-8">
+                      <TableSkeleton />
                     </td>
-                    <td className="py-5">
-                      <span className="bg-black text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
-                        {lesson.subject}
-                      </span>
-                    </td>
-                    <td className="py-5 font-medium text-gray-700">{lesson.duration}</td>
                   </tr>
-                ))}
+                ) : RECENT_LESSONS.length > 0 ? (
+                  RECENT_LESSONS.map((lesson) => (
+                    <tr key={lesson.id} className="group hover:bg-gray-50 transition-colors">
+                      <td className="py-5 pr-4 flex items-center gap-4">
+                        <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center text-xl">
+                          {lesson.icon}
+                        </div>
+                        <div>
+                          <div className="font-bold text-gray-900">{lesson.name}</div>
+                          <div className="text-sm text-gray-500">Topic: {lesson.topic}</div>
+                        </div>
+                      </td>
+                      <td className="py-5">
+                        <span className="bg-black text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
+                          {lesson.subject}
+                        </span>
+                      </td>
+                      <td className="py-5 font-medium text-gray-700">{lesson.duration}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={3} className="py-10 text-center text-gray-400">
+                      No recent lessons found.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

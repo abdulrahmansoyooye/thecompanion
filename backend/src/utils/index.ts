@@ -18,5 +18,5 @@ export const generateAcessToken = async (
     throw new AppError("JWT_SECRET is missing in .env file", 500, "JWT_MISSING");
   }
 
-  return jwt.sign(payload, secret, { expiresIn });
+  return jwt.sign(payload, secret);
 }

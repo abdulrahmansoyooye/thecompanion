@@ -10,7 +10,7 @@ interface CompanionCardProps {
 
 const CompanionCard: React.FC<CompanionCardProps> = ({ companion, compact }) => {
   return (
-    <div className={`companion-card ${companion.color}`}>
+    <div className={`companion-card ${companion.iconColor}`}>
       <div className="flex justify-between items-start mb-4">
         <span className="bg-black text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
           {companion.subject}
@@ -28,7 +28,7 @@ const CompanionCard: React.FC<CompanionCardProps> = ({ companion, compact }) => 
       <div className="mt-auto">
         <div className="flex items-center gap-1.5 text-gray-600 text-xs mb-4">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-          {companion.duration} duration
+          {companion.duration} mins duration
         </div>
 
         <Link

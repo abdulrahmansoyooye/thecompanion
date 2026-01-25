@@ -5,10 +5,11 @@ export interface Companion {
   id: string;
   name: string;
   topic: string;
+  iconColor:string;
   subject: Subject;
   duration: string;
   icon: string;
-  imageUrl?: string; // Support for uploaded images
+   // Support for uploaded images
   color: string;
   voiceType?: 'Male' | 'Female';
   speakingStyle?: 'Formal' | 'Casual' | 'Cheerful';

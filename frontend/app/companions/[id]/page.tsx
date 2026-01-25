@@ -6,6 +6,9 @@ import { vapi } from '@/lib/vapi';
 import { Loader2, Mic, MicOff, Phone, PhoneOff, RotateCcw } from 'lucide-react';
 import { CreateAssistantDTO } from '@vapi-ai/web/dist/api';
 import { toast } from 'sonner';
+import { addToHistory, getCompanionByID } from '@/services/companion.services';
+import { Companion } from '@/types/types';
+import { LessonSkeleton } from '@/components/ui/LessonSkeleton';
 
 enum CallStatus {
   INACTIVE = "INACTIVE",
@@ -14,8 +17,8 @@ enum CallStatus {
   FINISHED = "FINISHED",
 }
 const getAssistantConfig = (companion: any): CreateAssistantDTO => ({
-  name: companion.name,
-  firstMessage: `Hello, I'm ${companion.name}. Let's discuss ${companion.topic}.`,
+  name: companion.name || "AI Tutor",
+  firstMessage: `Hello, I'm ${companion.name}. Can we start discussing ${companion.topic} or would you like to chat a bit first?`,
   transcriber: {
     provider: "deepgram",
     model: "nova-2",
@@ -23,18 +26,21 @@ const getAssistantConfig = (companion: any): CreateAssistantDTO => ({
   },
   voice: {
     provider: "11labs",
-    voiceId: "21m00Tcm4TlvDq8ikWAM", // Standard 'Rachel' voice, highly reliable
+    voiceId: "21m00Tcm4TlvDq8ikWAM", // Rachel
   },
   model: {
     provider: "openai",
-    model: "gpt-3.5-turbo",
+    model: "gpt-4o-mini",
     messages: [
       {
         role: "system",
-        content: `You are a tutor.
-                  Topic: ${companion.topic}
-                  Subject: ${companion.subject}
-                  Keep responses short and conversational.`,
+        content: `You are a friendly and encouraging AI tutor named ${companion.name}. 
+Focus on explaining: ${companion.topic} (within the field of ${companion.subject}).
+Guidelines:
+- Keep responses short (1-3 sentences) to maintain natural conversation flow.
+- Be encouraging and supportive.
+- Occasionally ask questions to check student understanding.
+- Do not use markdown like bolding or bullet points as this is for voice interaction.`,
       },
     ],
   },
@@ -56,7 +62,8 @@ interface Message {
 const LessonRoom: React.FC = () => {
   const params = useParams();
   const id = typeof params?.id === 'string' ? params.id : Array.isArray(params?.id) ? params.id[0] : '';
-  const companion = INITIAL_COMPANIONS.find(c => c.id === id) || INITIAL_COMPANIONS[0];
+  const [companion, setCompanion] = useState<Companion | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const [isMicOn, setIsMicOn] = useState(true);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -64,11 +71,27 @@ const LessonRoom: React.FC = () => {
   const [messages, setMessages] = useState<SavedMessage[]>([]);
 
   useEffect(() => {
+    const fetchCompanions = async () => {
+      try {
+        setLoading(true);
+        const response = await getCompanionByID(id);
+        setCompanion(response.data)
+
+      } catch (error) {
+        console.error('Error fetching companions:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCompanions();
     const onCallStart = () => {
       setCallStatus(CallStatus.ACTIVE);
       setIsMicOn(true); // Default to mic on when call starts
     };
-    const onCallEnd = () => setCallStatus(CallStatus.INACTIVE);
+    const onCallEnd = () => {
+      addToHistory(companion.id)
+      setCallStatus(CallStatus.INACTIVE)
+    };
     const onSpeechStart = () => setIsSpeaking(true);
     const onSpeechEnd = () => setIsSpeaking(false);
     const onError = (error: Error) => {
@@ -111,15 +134,21 @@ const LessonRoom: React.FC = () => {
   };
 
   const handleStart = async () => {
+    if (!companion) return;
+
     setCallStatus(CallStatus.CONNECTING);
     try {
-      console.log("Starting Vapi session...");
+      if (!process.env.NEXT_PUBLIC_VAPI_API_KEY) {
+        throw new Error("Vapi API Key is missing. Please check your environment variables.");
+      }
+
       const assistantConfig = getAssistantConfig(companion);
+      console.log("Starting Vapi with config:", assistantConfig);
       await vapi.start(assistantConfig);
     } catch (err: any) {
-      console.error("Failed to start call catch block:", err);
+      console.error("Vapi start unexpected error:", err);
       toast.error("Failed to start session", {
-        description: "Please check your microphone permissions and try again."
+        description: err.message || "Please check your microphone permissions and try again."
       });
       setCallStatus(CallStatus.INACTIVE);
     }
@@ -138,12 +167,16 @@ const LessonRoom: React.FC = () => {
 
   const currentTranscript = messages.length > 0 ? messages[0].content : "Ready to start the lesson...";
 
+  if (loading || !companion) {
+    return <LessonSkeleton />;
+  }
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex flex-col min-h-[calc(100vh-80px)]">
       {/* Top Header Card */}
       <div className="bg-white border border-gray-300 rounded-2xl sm:rounded-3xl px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 sm:mb-8 shadow-sm">
         <div className="flex items-center gap-4 w-full sm:w-auto">
-          <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center text-2xl sm:text-3xl ${companion.color} border-none shrink-0`}>
+          <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center text-2xl sm:text-3xl ${companion.iconColor} border-none shrink-0`}>
             {companion.icon}
           </div>
           <div className="min-w-0">
@@ -157,7 +190,7 @@ const LessonRoom: React.FC = () => {
           </div>
         </div>
         <div className="text-gray-900 font-bold text-base sm:text-lg w-full sm:w-auto flex justify-end">
-          {companion.duration}
+          {companion.duration} mins
         </div>
       </div>
 
@@ -171,7 +204,7 @@ const LessonRoom: React.FC = () => {
           )}
 
           <div className="flex flex-col items-center gap-6">
-            <div className={`w-24 h-24 sm:w-32 sm:h-32 ${companion.color} rounded-2xl flex items-center justify-center text-5xl sm:text-6xl shadow-sm border-2 ${isSpeaking ? 'border-[#FF5B37] scale-110' : 'border-blue-400 border-dashed'} transition-all duration-300`}>
+            <div className={`w-24 h-24 sm:w-32 sm:h-32 ${companion.iconColor} rounded-2xl flex items-center justify-center text-5xl sm:text-6xl shadow-sm border-2 ${isSpeaking ? 'border-[#FF5B37] scale-110' : 'border-gray-200 border-dashed'} transition-all duration-300`}>
               {companion.icon}
             </div>
             <div className="px-4 py-1 flex flex-col items-center gap-2">

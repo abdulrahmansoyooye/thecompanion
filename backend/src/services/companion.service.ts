@@ -9,6 +9,7 @@ interface CompanionPayload {
    iconColor: string;
    style: string;
    language: string;
+   duration: number;
 }
 
 export const CompanionService = {
@@ -44,5 +45,13 @@ export const CompanionService = {
       return prisma.companion.delete({
          where: { id }
       });
+   },
+   async addToHistory(userId:string,id:string){
+     return prisma.history.create({
+      data:{
+         userId,
+         companionId:id
+      }
+     })
    }
 };

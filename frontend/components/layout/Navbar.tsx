@@ -92,7 +92,10 @@ const Navbar = ({ session }: NavbarProps) => {
                 </span>
               </div>
               <button
-                onClick={() => signOut({ redirectTo: "/sign-in" })}
+                onClick={() => {
+                  localStorage.setItem("manual_logout", "true");
+                  signOut({ redirectTo: "/sign-in" });
+                }}
                 className="text-sm font-medium hover:opacity-70 transition flex items-center gap-1 text-red-600 cursor-pointer"
                 title="Sign Out"
               >
@@ -173,6 +176,7 @@ const Navbar = ({ session }: NavbarProps) => {
                   <button
                     onClick={() => {
                       setOpen(false);
+                      localStorage.setItem("manual_logout", "true");
                       signOut();
                     }}
                     className="flex items-center gap-3 px-4 py-3 text-sm hover:bg-black/5 transition text-red-600 w-full text-left font-medium cursor-pointer"

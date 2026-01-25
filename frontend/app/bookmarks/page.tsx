@@ -1,15 +1,36 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Bookmark, Search, Filter, Play, Trash2, Clock, BookOpen, Sparkles } from 'lucide-react';
-import { INITIAL_COMPANIONS } from '@/constants/constants';
+import { getAllCompanions } from '@/services/companion.services';
+import { Companion } from '@/types/types';
 import CompanionCard from '@/components/cards/CompanionCard';
+import { CompanionSkeleton } from '@/components/cards/CompanionSkeleton';
+import { useEffect, useState } from 'react';
+import { Bookmark, Search, Sparkles } from 'lucide-react';
 
 const BookmarksPage = () => {
     const [searchQuery, setSearchQuery] = useState("");
+    const [companions, setCompanions] = useState<Companion[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    // Mocking bookmarked companions from INITIAL_COMPANIONS
-    const bookmarkedCompanions = INITIAL_COMPANIONS.slice(0, 4);
+    useEffect(() => {
+        const fetchCompanions = async () => {
+            try {
+                setLoading(true);
+                const res = await getAllCompanions();
+                if (res?.data) {
+                    setCompanions(res.data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch bookmarks", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchCompanions();
+    }, []);
+
+    // Simulating bookmarks (in a real app, this would be a filtered API call or local state)
+    const bookmarkedCompanions = companions;
 
     const filteredBookmarks = bookmarkedCompanions.filter(c =>
         c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -42,16 +63,20 @@ const BookmarksPage = () => {
                 </div>
             </div>
 
-            {filteredBookmarks.length > 0 ? (
+            {loading ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <CompanionSkeleton />
+                    <CompanionSkeleton />
+                    <CompanionSkeleton />
+                    <CompanionSkeleton />
+                </div>
+            ) : filteredBookmarks.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {filteredBookmarks.map((companion) => (
                         <div key={companion.id} className="group relative">
                             <CompanionCard companion={companion} />
-                            {/* Overlay for quick actions if needed */}
                         </div>
                     ))}
-
-                    {/* Add New Bookmark Mock Button */}
                     <div className="border-2 border-dashed border-gray-200 rounded-3xl flex flex-col items-center justify-center p-8 text-center bg-gray-50/30 hover:bg-gray-50 hover:border-[#FF5B37]/30 transition-all group cursor-pointer h-full min-h-[300px]">
                         <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm group-hover:scale-110 transition-transform">
                             <Sparkles className="text-[#FF5B37]" size={24} />

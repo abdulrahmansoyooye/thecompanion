@@ -18,6 +18,7 @@ const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onC
     topic: '',
     subject: 'Science',
     voiceType: 'Rachel',
+    duration: '',
     style: 'Friendly',
     language: 'English',
     iconColor: "",
@@ -29,6 +30,7 @@ const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onC
       setFormData({
         name: editData.name || '',
         topic: editData.topic || '',
+        duration: editData.duration || '',
         subject: editData.subject || 'Science',
         voiceType: editData.voiceType || 'Rachel',
         style: editData.style || 'Friendly',
@@ -40,6 +42,7 @@ const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onC
       setFormData({
         name: '',
         topic: '',
+        duration: '',
         subject: 'Science',
         voiceType: 'Rachel',
         style: 'Friendly',

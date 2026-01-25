@@ -1,14 +1,35 @@
-"use client"
+"use client";
+import { getAllCompanions } from '@/services/companion.services';
+import { Companion } from '@/types/types';
 import CompanionCard from '@/components/cards/CompanionCard';
-import { INITIAL_COMPANIONS } from '@/constants/constants';
-import React, { useState } from 'react';
+import { CompanionSkeleton } from '@/components/cards/CompanionSkeleton';
+import React, { useEffect, useState } from 'react';
 
 
 const CompanionLibrary: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('All');
+  const [companions, setCompanions] = useState<Companion[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredCompanions = INITIAL_COMPANIONS.filter(comp => {
+  useEffect(() => {
+    const fetchCompanions = async () => {
+      try {
+        setLoading(true);
+        const res = await getAllCompanions();
+        if (res?.data) {
+          setCompanions(res.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch companions", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCompanions();
+  }, []);
+
+  const filteredCompanions = companions.filter(comp => {
     const matchesSearch = comp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       comp.topic.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesSubject = selectedSubject === 'All' || comp.subject === selectedSubject;
@@ -45,7 +66,11 @@ const CompanionLibrary: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {filteredCompanions.map((comp) => (
+        {loading ? (
+          Array.from({ length: 6 }).map((_, i) => (
+            <CompanionSkeleton key={i} />
+          ))
+        ) : filteredCompanions.map((comp) => (
           <CompanionCard key={comp.id} companion={comp} />
         ))}
       </div>

@@ -18,6 +18,7 @@ export async function CreateCompanion(companionData: any) {
         language: companionData.language,
         subject: companionData.subject || '',
         icon: companionData.icon || '🧠',
+        duration: companionData.duration || 20,
         iconColor: companionData.iconColor || COLORS[companionData.subject as keyof typeof COLORS] || COLORS["Science"],
     };
 
@@ -37,5 +38,11 @@ export async function updateCompanion(id: string, companionData: any) {
 export async function removeCompanion(id: string) {
     return fetchWithAuth(`/companions/${id}`, {
         method: "DELETE"
+    });
+}
+
+export async function addToHistory(id: string | null)  {
+    return fetchWithAuth(`/companions/add-to-history/${id}`, {
+        method: "POST"
     });
 }

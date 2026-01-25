@@ -1,7 +1,9 @@
+
 import type { Metadata } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
+import { Providers } from "@/components/providers/SessionProvider";
 
 import { auth } from "@/lib/auth";
 const bricolage = Bricolage_Grotesque({
@@ -15,7 +17,6 @@ export const metadata: Metadata = {
 };
 
 
-import { Providers } from "@/components/providers/SessionProvider";
 
 export default async function RootLayout({
   children,
@@ -27,6 +28,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={`${bricolage.variable}`}>
+     
         <Providers session={session}>
           <Navbar session={session} />
           {children}

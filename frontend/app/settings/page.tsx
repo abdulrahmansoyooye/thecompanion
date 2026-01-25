@@ -8,6 +8,7 @@ import { deleteAccount } from '@/services/user.services';
 import CreateCompanionModal from '@/components/modals/CreateCompanionModal';
 import { Companion } from '@/types/types';
 import { toast } from 'sonner';
+import { ListSkeleton } from '@/components/ui/ListSkeleton';
 
 const SettingsPage = () => {
     const { data: session } = useSession();
@@ -50,6 +51,7 @@ const SettingsPage = () => {
             try {
                 await deleteAccount();
                 toast.success("Account deleted successfully");
+                localStorage.setItem("manual_logout", "true");
                 signOut({ callbackUrl: '/sign-in' });
             } catch (error) {
                 // error is already toasted in service
@@ -98,7 +100,10 @@ const SettingsPage = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <button
-                                onClick={() => signOut()}
+                                onClick={() => {
+                                    localStorage.setItem("manual_logout", "true");
+                                    signOut();
+                                }}
                                 className="flex items-center justify-between p-5 rounded-2xl border border-gray-100 hover:bg-gray-50 transition-all group"
                             >
                                 <div className="flex items-center gap-4">
@@ -140,9 +145,7 @@ const SettingsPage = () => {
                     </div>
                     <div className="p-8">
                         {loading ? (
-                            <div className="flex justify-center py-10">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#FF5B37]"></div>
-                            </div>
+                            <ListSkeleton />
                         ) : companions.length === 0 ? (
                             <div className="text-center py-10 border-2 border-dashed border-gray-100 rounded-3xl">
                                 <p className="text-gray-400 font-medium mb-4">No companions found</p>

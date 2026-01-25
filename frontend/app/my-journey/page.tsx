@@ -1,40 +1,66 @@
+"use client"
 
 import { RECENT_LESSONS } from '@/constants/constants';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { ProfileSkeleton } from '@/components/ui/ProfileSkeleton';
+import { StatsSkeleton } from '@/components/ui/StatsSkeleton';
+import { TableSkeleton } from '@/components/ui/TableSkeleton';
 
 const MyJourney: React.FC = () => {
-  
+  const { data: session, status } = useSession();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (status !== "loading") {
+      setLoading(false);
+    }
+  }, [status]);
   return (
     <div className="max-w-7xl mx-auto px-8 py-10">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
         <div className="flex items-center gap-6 ">
-          <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center text-3xl">👤</div>
-          <div>
-            <h1 className="text-3xl font-extrabold text-gray-900">Adrian Hajdin</h1>
-            <p className="text-gray-500 font-medium">adrian@jsmastery.pro</p>
-          </div>
+          {loading ? (
+            <ProfileSkeleton />
+          ) : (
+            <>
+              <div className="w-20 h-20 bg-[#FF5B37] rounded-full flex items-center justify-center text-3xl text-white font-bold">
+                {session?.user?.name?.[0] || '👤'}
+              </div>
+              <div>
+                <h1 className="text-3xl font-extrabold text-gray-900">{session?.user?.name || 'User'}</h1>
+                <p className="text-gray-500 font-medium">{session?.user?.email}</p>
+              </div>
+            </>
+          )}
         </div>
-       
-        <div className="flex gap-4">
-          <div className="bg-white border border-gray-200 p-6 rounded-[2rem] shadow-sm flex items-center gap-4 min-w-[200px]">
-            <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500 border border-orange-100">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-            </div>
-            <div>
-              <div className="text-2xl font-bold">23</div>
-              <div className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Lessons Completed</div>
-            </div>
-          </div>
 
-          <div className="bg-white border border-gray-200 p-6 rounded-[2rem] shadow-sm flex items-center gap-4 min-w-[200px]">
-            <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-[#FF5B37] border border-red-100">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z" /><path d="M6 12v5c3 3 9 3 12 0v-5" /></svg>
-            </div>
-            <div>
-              <div className="text-2xl font-bold">10</div>
-              <div className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Companions Created</div>
-            </div>
-          </div>
+        <div className="flex gap-4">
+          {loading ? (
+            <StatsSkeleton />
+          ) : (
+            <>
+              <div className="bg-white border border-gray-200 p-6 rounded-4xl shadow-sm flex items-center gap-4 min-w-[200px]">
+                <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500 border border-orange-100">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">23</div>
+                  <div className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Lessons Completed</div>
+                </div>
+              </div>
+
+              <div className="bg-white border border-gray-200 p-6 rounded-4xl shadow-sm flex items-center gap-4 min-w-[200px]">
+                <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-[#FF5B37] border border-red-100">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z" /><path d="M6 12v5c3 3 9 3 12 0v-5" /></svg>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">10</div>
+                  <div className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Companions Created</div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
@@ -51,7 +77,13 @@ const MyJourney: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {RECENT_LESSONS.map((lesson) => (
+              {loading ? (
+                <tr>
+                  <td colSpan={3} className="py-8">
+                    <TableSkeleton />
+                  </td>
+                </tr>
+              ) : RECENT_LESSONS.map((lesson) => (
                 <tr key={lesson.id} className="group hover:bg-gray-50 transition-all duration-300">
                   <td className="py-6 pr-4 flex items-center gap-5">
                     <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">

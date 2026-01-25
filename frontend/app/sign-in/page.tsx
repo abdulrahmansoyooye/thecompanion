@@ -36,7 +36,7 @@ const SignIn: React.FC = () => {
           <span className="font-semibold text-gray-700 text-sm" >Continue with Google</span>
         </button>
 
-        <div className="w-full flex items-center gap-4 mb-8">
+        {/* <div className="w-full flex items-center gap-4 mb-8">
           <div className="h-px flex-1 bg-gray-100"></div>
           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">or</span>
           <div className="h-px flex-1 bg-gray-100"></div>
@@ -61,10 +61,10 @@ const SignIn: React.FC = () => {
           >
             Continue
           </button>
-        </form>
+        </form> */}
 
         <p className="mt-8 text-sm font-bold text-gray-400">
-          Don't have an account? <Link href="/signup" className="text-[#FF5B37] hover:underline">Sign up</Link>
+          Facing issues? <Link href="/auth-error" className="text-[#FF5B37] hover:underline">Report the issue</Link>
         </p>
       </div>
     </div>
