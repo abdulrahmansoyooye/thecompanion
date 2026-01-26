@@ -1,6 +1,6 @@
 import { prisma } from "../lib/prisma.js";
 
-interface CompanionPayload {
+export interface CompanionPayload {
    name: string;
    icon: string;
    subject: string;
@@ -46,12 +46,17 @@ export const CompanionService = {
          where: { id }
       });
    },
-   async addToHistory(userId:string,id:string){
-     return prisma.history.create({
-      data:{
-         userId,
-         companionId:id
-      }
-     })
+   async addToHistory(userId: string, id: string) {
+      return prisma.history.create({
+         data: {
+            userId,
+            companionId: id
+         }
+      })
+   },
+   async getHistory(userId: string) {
+      return prisma.history.findMany({
+         where: { userId }
+      });
    }
 };

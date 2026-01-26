@@ -46,3 +46,7 @@ export async function addToHistory(id: string | null)  {
         method: "POST"
     });
 }
+
+export async function getHistory(id:string | null){
+    return fetchWithAuth(`/companions/history`);
+}

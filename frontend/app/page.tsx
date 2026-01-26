@@ -2,20 +2,21 @@
 
 import React, { useEffect, useState } from 'react';
 import CompanionCard from '@/components/cards/CompanionCard';
-import { INITIAL_COMPANIONS, RECENT_LESSONS } from '@/constants/constants';
 import CreateCompanionModal from '@/components/modals/CreateCompanionModal';
-import { getAllCompanions } from '../services/companion.services';
-import { Companion } from '@/types/types';
+import { getAllCompanions, getHistory } from '../services/companion.services';
+import { Companion, Lesson } from '@/types/types';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { CompanionSkeleton } from '@/components/cards/CompanionSkeleton';
 import { TableSkeleton } from '@/components/ui/TableSkeleton';
-
+import Link from 'next/link';
+import { RecentLessons } from '@/components/cards/RecentLessons';
 const Dashboard: React.FC = () => {
   const { data: session, status } = useSession();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [companions, setCompanions] = useState<Companion[]>([]);
   const [loading, setLoading] = useState(true);
+  const [history, setHistory] = useState<Lesson[]>([]);
   const navigate = useRouter();
 
   useEffect(() => {
@@ -25,6 +26,8 @@ const Dashboard: React.FC = () => {
   }, [status, navigate]);
 
   useEffect(() => {
+    if (status !== "authenticated") return;
+
     const fetchCompanions = async () => {
       try {
         setLoading(true);
@@ -38,10 +41,25 @@ const Dashboard: React.FC = () => {
         setLoading(false);
       }
     };
+    const fetchLessons = async () => {
+      try {
+        setLoading(true);
+        
+        const response = await getHistory(session?.user?.id ?? null);
+        if (response.data) {
+          setHistory(response.data);
+        }
+      } catch (error) {
+        console.error('Error fetching history:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchCompanions();
-  }, [])
+    fetchLessons();
+  }, [status, session?.user?.id])
   const featuredCompanions = companions.slice(0, 3);
-
+  const recent_lessons = history.slice(0, 5);
   return (
     <main className="">
       <h1 className="mb-8">Dashboard</h1>
@@ -92,25 +110,9 @@ const Dashboard: React.FC = () => {
                       <TableSkeleton />
                     </td>
                   </tr>
-                ) : RECENT_LESSONS.length > 0 ? (
-                  RECENT_LESSONS.map((lesson) => (
-                    <tr key={lesson.id} className="group hover:bg-gray-50 transition-colors">
-                      <td className="py-5 pr-4 flex items-center gap-4">
-                        <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center text-xl">
-                          {lesson.icon}
-                        </div>
-                        <div>
-                          <div className="font-bold text-gray-900">{lesson.name}</div>
-                          <div className="text-sm text-gray-500">Topic: {lesson.topic}</div>
-                        </div>
-                      </td>
-                      <td className="py-5">
-                        <span className="bg-black text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
-                          {lesson.subject}
-                        </span>
-                      </td>
-                      <td className="py-5 font-medium text-gray-700">{lesson.duration}</td>
-                    </tr>
+                ) : recent_lessons.length > 0 ? (
+                  recent_lessons.map((lesson) => (
+                    <RecentLessons key={lesson.id} lesson={lesson} />
                   ))
                 ) : (
                   <tr>
@@ -146,13 +148,13 @@ const Dashboard: React.FC = () => {
             ))}
           </div>
 
-          <button
-            onClick={() => setIsModalOpen(true)}
+          <Link
+            href={"/companions/new"}
             className="w-full bg-[#FF5B37] hover:bg-[#e64d2b] text-white font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-orange-500/20 flex items-center justify-center gap-2 cursor-pointer"
           >
             <span className="text-xl">+</span>
             Build New Companion
-          </button>
+          </Link>
         </div>
       </div>
 

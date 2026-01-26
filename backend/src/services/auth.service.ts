@@ -2,6 +2,8 @@ import { AppError } from "../lib/errors/AppError.js";
 import { prisma } from "../lib/prisma.js";
 import bcrypt from "bcrypt";
 import { generateAcessToken } from "../utils/index.js";
+import { companions } from "../constants/companions.js";
+
 
 export const AuthService = {
     register: async (email: string, password: string) => {
@@ -66,9 +68,21 @@ export const AuthService = {
                 data: {
                     email,
                     passwordHash: "",
-                   
+
                 }
             });
+
+            const defaultCompanion = companions[0];
+            if (defaultCompanion) {
+                await prisma.companion.createMany({
+                    data: companions.map((companion) => {
+                        return {
+                            userId: user!.id,
+                            ...companion
+                        }
+                    })
+                });
+            }
         }
 
         const token = await generateAcessToken(user);

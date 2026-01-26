@@ -49,3 +49,12 @@ export const addToHistory = asyncHandler(async (req: Request, res: Response) => 
     await CompanionService.addToHistory(userId as string,id as string);
     return res.sendMessage(200, true, "Companion added to history successfully");
 });
+
+
+export const getHistory = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.userId; 
+    if (!userId) throw new AppError("Authentication required", 401, "UNAUTHORIZED");
+
+    const history = await CompanionService.getHistory(userId as string);
+    return res.sendMessage(200, true, "History fetched successfully", history);
+});

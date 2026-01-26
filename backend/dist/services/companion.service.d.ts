@@ -1,4 +1,4 @@
-interface CompanionPayload {
+export interface CompanionPayload {
     name: string;
     icon: string;
     subject: string;
@@ -23,7 +23,6 @@ export declare const CompanionService: {
         style: string;
         duration: number;
         language: string;
-        updatedAt: Date;
     }>;
     list(userId: string): Promise<{
         id: string;
@@ -38,7 +37,6 @@ export declare const CompanionService: {
         style: string;
         duration: number;
         language: string;
-        updatedAt: Date;
     }[]>;
     getOne(id: string): Promise<{
         id: string;
@@ -53,7 +51,6 @@ export declare const CompanionService: {
         style: string;
         duration: number;
         language: string;
-        updatedAt: Date;
     } | null>;
     update(id: string, payload: Partial<CompanionPayload>): Promise<{
         id: string;
@@ -68,7 +65,6 @@ export declare const CompanionService: {
         style: string;
         duration: number;
         language: string;
-        updatedAt: Date;
     }>;
     remove(id: string): Promise<{
         id: string;
@@ -83,7 +79,6 @@ export declare const CompanionService: {
         style: string;
         duration: number;
         language: string;
-        updatedAt: Date;
     }>;
     addToHistory(userId: string, id: string): Promise<{
         id: string;
@@ -92,5 +87,4 @@ export declare const CompanionService: {
         companionId: string;
     }>;
 };
-export {};
 //# sourceMappingURL=companion.service.d.ts.map

@@ -29,7 +29,6 @@ model Companion {
   duration      Int
   language      String
   createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
   history       History[]
   user          User           @relation(fields: [userId], references: [id])
 }

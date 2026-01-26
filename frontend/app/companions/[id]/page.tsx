@@ -1,10 +1,9 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { INITIAL_COMPANIONS } from '@/constants/constants';
 import { vapi } from '@/lib/vapi';
 import { Loader2, Mic, MicOff, Phone, PhoneOff, RotateCcw } from 'lucide-react';
-import { CreateAssistantDTO } from '@vapi-ai/web/dist/api';
+
 import { toast } from 'sonner';
 import { addToHistory, getCompanionByID } from '@/services/companion.services';
 import { Companion } from '@/types/types';
@@ -16,41 +15,15 @@ enum CallStatus {
   ACTIVE = "ACTIVE",
   FINISHED = "FINISHED",
 }
-const getAssistantConfig = (companion: any): CreateAssistantDTO => ({
-  name: companion.name || "AI Tutor",
-  firstMessage: `Hello, I'm ${companion.name}. Can we start discussing ${companion.topic} or would you like to chat a bit first?`,
-  transcriber: {
-    provider: "deepgram",
-    model: "nova-2",
-    language: "en-US",
-  },
-  voice: {
-    provider: "11labs",
-    voiceId: "21m00Tcm4TlvDq8ikWAM", // Rachel
-  },
-  model: {
-    provider: "openai",
-    model: "gpt-4o-mini",
-    messages: [
-      {
-        role: "system",
-        content: `You are a friendly and encouraging AI tutor named ${companion.name}. 
-Focus on explaining: ${companion.topic} (within the field of ${companion.subject}).
-Guidelines:
-- Keep responses short (1-3 sentences) to maintain natural conversation flow.
-- Be encouraging and supportive.
-- Occasionally ask questions to check student understanding.
-- Do not use markdown like bolding or bullet points as this is for voice interaction.`,
-      },
-    ],
-  },
-});
+import { useRouter } from 'next/navigation';
+import { getAssistantConfig } from '@/config/vapi';
+import { useSession } from 'next-auth/react';
+
 interface SavedMessage {
   role: string;
   content: string;
 }
 
-// Minimal type definition for Vapi Message to avoid errors
 interface Message {
   type: string;
   transcriptType?: string;
@@ -65,11 +38,13 @@ const LessonRoom: React.FC = () => {
   const [companion, setCompanion] = useState<Companion | null>(null);
   const [loading, setLoading] = useState(true);
 
+
+const {data:session} = useSession()
   const [isMicOn, setIsMicOn] = useState(true);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
   const [messages, setMessages] = useState<SavedMessage[]>([]);
-
+  const router = useRouter()
   useEffect(() => {
     const fetchCompanions = async () => {
       try {
@@ -83,17 +58,31 @@ const LessonRoom: React.FC = () => {
         setLoading(false);
       }
     };
+
     fetchCompanions();
+
     const onCallStart = () => {
       setCallStatus(CallStatus.ACTIVE);
       setIsMicOn(true); // Default to mic on when call starts
     };
-    const onCallEnd = () => {
-      addToHistory(companion.id)
+
+    const onCallEnd = async () => {
+      console.log("lesson ended")
+      if (companion) {
+        const res = await addToHistory(companion.id)
+        console.log(res)
+        if (res.ok) {
+          toast.success("Conversation saved successfully")
+          router.push("/")
+        }
+      }
+      toast.error("Conversation not saved")
       setCallStatus(CallStatus.INACTIVE)
+
     };
     const onSpeechStart = () => setIsSpeaking(true);
     const onSpeechEnd = () => setIsSpeaking(false);
+    
     const onError = (error: Error) => {
       console.error("Vapi Error:", error);
       toast.error("Vapi Error", {
@@ -138,12 +127,15 @@ const LessonRoom: React.FC = () => {
 
     setCallStatus(CallStatus.CONNECTING);
     try {
-      if (!process.env.NEXT_PUBLIC_VAPI_API_KEY) {
-        throw new Error("Vapi API Key is missing. Please check your environment variables.");
+      // Check for microphone permissions first
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach(track => track.stop()); // Stop the test stream
+      } catch (permErr) {
+        throw new Error("Microphone access denied. Please enable microphone permissions in your browser settings.");
       }
 
-      const assistantConfig = getAssistantConfig(companion);
-      console.log("Starting Vapi with config:", assistantConfig);
+      const assistantConfig = getAssistantConfig(companion, session?.user);
       await vapi.start(assistantConfig);
     } catch (err: any) {
       console.error("Vapi start unexpected error:", err);
@@ -154,7 +146,17 @@ const LessonRoom: React.FC = () => {
     }
   };
 
-  const handleStop = () => {
+  const handleStop = async () => {
+     console.log("lesson ended")
+      if (companion) {
+        const res = await addToHistory(companion.id)
+        console.log(res)
+        if (res.success) {
+          toast.success("Conversation saved successfully")
+          router.push("/")
+        }
+      }
+    
     setCallStatus(CallStatus.FINISHED); // Temporarily 'finished' before actual end event
     vapi.stop();
   };
