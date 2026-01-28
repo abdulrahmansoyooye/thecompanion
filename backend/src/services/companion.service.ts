@@ -15,21 +15,27 @@ export interface CompanionPayload {
 export const CompanionService = {
    async create(userId: string, payload: CompanionPayload) {
       return prisma.companion.create({
+         
          data: {
             userId,
             ...payload
-         }
+
+         },
       });
    },
 
    async list(userId: string) {
       return prisma.companion.findMany({
+         orderBy: {
+            createdAt: 'desc'
+         },
          where: { userId }
       });
    },
 
    async getOne(id: string) {
       return prisma.companion.findUnique({
+         
          where: { id }
       });
    },
@@ -60,6 +66,9 @@ export const CompanionService = {
       });
 
       return prisma.companion.findMany({
+         orderBy: {
+            createdAt: 'desc'
+         },
          where: { id: { in: history.map((h) => h.companionId) } }
       });
    }
