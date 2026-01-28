@@ -86,5 +86,11 @@ export declare const CompanionService: {
         userId: string;
         companionId: string;
     }>;
+    getHistory(userId: string): Promise<{
+        id: string;
+        createdAt: Date;
+        userId: string;
+        companionId: string;
+    }[]>;
 };
 //# sourceMappingURL=companion.service.d.ts.map

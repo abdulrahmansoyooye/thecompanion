@@ -44,8 +44,9 @@ const Dashboard: React.FC = () => {
     const fetchLessons = async () => {
       try {
         setLoading(true);
-        
-        const response = await getHistory(session?.user?.id ?? null);
+
+        const response = await getHistory();
+        console.log(response)
         if (response.data) {
           setHistory(response.data);
         }

@@ -3,7 +3,7 @@ import { getSession } from "next-auth/react";
 import { toast } from "sonner";
 
 
-const API_URL = "http://localhost:4000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 
 interface FetchOptions {
@@ -53,9 +53,10 @@ export async function fetchWithAuth(endpoint: string, options: FetchOptions = {}
         }
 
         return data;
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.log("Api request failed", error);
-        if (!options.silent && error.name !== 'Error') { // Don't toast twice if thrown above
+        const err = error as Error;
+        if (!options.silent && err.name !== 'Error') { // Don't toast twice if thrown above
             toast.error("Network Error", {
                 description: "Failed to connect to the server. Please check your connection."
             });

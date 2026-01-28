@@ -56,7 +56,7 @@ export const CompanionService = {
    },
    async getHistory(userId: string) {
       return prisma.history.findMany({
-         where: { userId }
+         where: { userId}
       });
    }
 };

@@ -9,7 +9,7 @@ export async function getAllCompanions() {
     return fetchWithAuth("/companions");
 }
 
-export async function CreateCompanion(companionData: any) {
+export async function CreateCompanion(companionData: Record<string, any>) {
     const payload = {
         name: companionData.name,
         topic: companionData.topic,
@@ -28,7 +28,7 @@ export async function CreateCompanion(companionData: any) {
     });
 }
 
-export async function updateCompanion(id: string, companionData: any) {
+export async function updateCompanion(id: string, companionData: Record<string, any>) {
     return fetchWithAuth(`/companions/${id}`, {
         method: "PUT",
         body: companionData
@@ -41,12 +41,12 @@ export async function removeCompanion(id: string) {
     });
 }
 
-export async function addToHistory(id: string | null)  {
+export async function addToHistory(id: string | null) {
     return fetchWithAuth(`/companions/add-to-history/${id}`, {
         method: "POST"
     });
 }
 
-export async function getHistory(id:string | null){
+export async function getHistory() {
     return fetchWithAuth(`/companions/history`);
 }

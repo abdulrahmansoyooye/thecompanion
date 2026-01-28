@@ -8,7 +8,7 @@ const SignIn: React.FC = () => {
 
   const handleContinue = async (e: React.FormEvent) => {
     e.preventDefault();
-    await signIn('nodemailer', { email, redirectTo: "/" });
+    await signIn('nodemailer', { email, redirectTo: "/companions/new" });
   };
 
   return (

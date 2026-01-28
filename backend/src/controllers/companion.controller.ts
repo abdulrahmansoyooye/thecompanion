@@ -55,6 +55,6 @@ export const getHistory = asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user?.userId; 
     if (!userId) throw new AppError("Authentication required", 401, "UNAUTHORIZED");
 
-    const history = await CompanionService.getHistory(userId as string);
+    const history = await CompanionService.getHistory(userId as string,);
     return res.sendMessage(200, true, "History fetched successfully", history);
 });

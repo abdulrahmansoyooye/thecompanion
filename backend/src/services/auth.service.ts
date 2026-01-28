@@ -1,7 +1,7 @@
 import { AppError } from "../lib/errors/AppError.js";
 import { prisma } from "../lib/prisma.js";
 import bcrypt from "bcrypt";
-import { generateAcessToken } from "../utils/index.js";
+import { generateAccessToken } from "../utils/index.js";
 import { companions } from "../constants/companions.js";
 
 
@@ -22,7 +22,7 @@ export const AuthService = {
             }
         });
 
-        const token = await generateAcessToken(user);
+        const token = await generateAccessToken(user);
         return {
             user: { id: user.id, email: user.email },
             token
@@ -41,7 +41,7 @@ export const AuthService = {
             throw new AppError("Invalid email or password", 401, "AUTH_FAILED");
         }
 
-        const token = await generateAcessToken(user);
+        const token = await generateAccessToken(user);
         return {
             user: { id: user.id, email: user.email },
             token
@@ -85,7 +85,7 @@ export const AuthService = {
             }
         }
 
-        const token = await generateAcessToken(user);
+        const token = await generateAccessToken(user);
         return {
             user: { id: user.id, email: user.email },
             token

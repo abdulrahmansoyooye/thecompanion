@@ -4,5 +4,5 @@ export declare const messageHandler: (message: string, success: boolean, statusC
     statusCode: number;
     data: any;
 };
-export declare const generateAcessToken: (payload: object, expiresIn?: string | number) => Promise<string>;
+export declare const generateAccessToken: (payload: object, expiresIn?: string | number) => Promise<string>;
 //# sourceMappingURL=index.d.ts.map
