@@ -5,7 +5,7 @@
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
-    "start": "node dist/index.js",
+    "start": "nodemon",
     "dev": "nodemon",
     "build": "tsc",
     "postinstall": "prisma generate",

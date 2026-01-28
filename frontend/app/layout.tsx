@@ -1,13 +1,13 @@
 
 import type { Metadata } from "next";
-import { Bricolage_Grotesque } from "next/font/google";
+import { Outfit } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import { Providers } from "@/components/providers/SessionProvider";
 
 import { auth } from "@/lib/auth";
-const bricolage = Bricolage_Grotesque({
-  variable: "--font-bricolage",
+const font = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin"],
 });
 
@@ -27,8 +27,8 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${bricolage.variable}`}>
-     
+      <body className={`${font.variable}`}>
+
         <Providers session={session}>
           <Navbar session={session} />
           {children}

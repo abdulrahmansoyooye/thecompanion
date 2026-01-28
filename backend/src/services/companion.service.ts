@@ -55,8 +55,12 @@ export const CompanionService = {
       })
    },
    async getHistory(userId: string) {
-      return prisma.history.findMany({
+      const history = await prisma.history.findMany({
          where: { userId}
+      });
+
+      return prisma.companion.findMany({
+         where: { id: { in: history.map((h) => h.companionId) } }
       });
    }
 };

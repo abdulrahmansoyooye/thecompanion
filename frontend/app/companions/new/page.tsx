@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 
 import Image from "next/image"
 import { COLORS } from '@/constants/constants';
@@ -9,49 +9,35 @@ import { CreateCompanion } from '@/services/companion.services';
 const ICONS = ['🧠', '🧪', '➗', '⌨️', '📜', '📊', '💬', '🎨', '🌍', '♟️', '🔭', '📐', '🧬', '💡', '🚀'];
 
 const CompanionBuilder: React.FC = () => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedIcon, setSelectedIcon] = useState(ICONS[0]);
   const [selectedColorKey, setSelectedColorKey] = useState<keyof typeof COLORS>('Science');
   const [showSuccess, setShowSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     name: '',
     subject: '',
     topic: '',
-    icon:selectedIcon,
-    iconColor:selectedColorKey,
+    icon: selectedIcon,
+    iconColor: selectedColorKey,
     voiceType: 'Female',
     style: 'Formal',
     language: 'English'
   });
 
-  const handleImageClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-     const res = await CreateCompanion(formData);
-    console.log(res)
+      const res = await CreateCompanion(formData);
+      console.log(res)
     } catch (error) {
       console.error(error)
-    
-    }finally{
-        setIsSubmitting(false)
+
+    } finally {
+      setIsSubmitting(false)
     }
-    
+
   };
 
   const inputClass = "w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FF5B37]/20 placeholder-gray-400 transition-all";
@@ -61,16 +47,16 @@ const CompanionBuilder: React.FC = () => {
     return (
       <div className="max-w-4xl mx-auto px-8 py-32 flex flex-col items-center text-center animate-in-scale">
         <div className="w-32 h-32 bg-green-500 rounded-full flex items-center justify-center text-white mb-8 shadow-xl shadow-green-500/20">
-          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="animate-bounce"><polyline points="20 6 9 17 4 12"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="animate-bounce"><polyline points="20 6 9 17 4 12" /></svg>
         </div>
         <h1 className="text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">Companion Created!</h1>
         <p className="text-gray-500 text-lg max-w-md">
           <span className="font-bold text-gray-900">{formData.name || 'Your companion'}</span> is ready to help you learn. Redirecting you to your library...
         </p>
         <div className="mt-10 flex gap-2">
-           <div className="w-2 h-2 bg-[#FF5B37] rounded-full animate-bounce"></div>
-           <div className="w-2 h-2 bg-[#FF5B37] rounded-full animate-bounce [animation-delay:0.2s]"></div>
-           <div className="w-2 h-2 bg-[#FF5B37] rounded-full animate-bounce [animation-delay:0.4s]"></div>
+          <div className="w-2 h-2 bg-[#FF5B37] rounded-full animate-bounce"></div>
+          <div className="w-2 h-2 bg-[#FF5B37] rounded-full animate-bounce [animation-delay:0.2s]"></div>
+          <div className="w-2 h-2 bg-[#FF5B37] rounded-full animate-bounce [animation-delay:0.4s]"></div>
         </div>
       </div>
     );
@@ -88,38 +74,23 @@ const CompanionBuilder: React.FC = () => {
         <div className="lg:col-span-5 space-y-8">
           <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col items-center">
             <h2 className="text-lg font-bold mb-6 w-full text-center">Appearance</h2>
-            
-            <div 
-              onClick={handleImageClick}
-              className={`relative group cursor-pointer w-48 h-48 mb-8 ${COLORS[selectedColorKey]} border-4 rounded-[3.5rem] p-1 shadow-inner overflow-hidden transition-all duration-300 hover:scale-105 active:scale-95`}
+
+            <div
+              className={`relative w-48 h-48 mb-8 ${COLORS[selectedColorKey]} border-4 rounded-[3.5rem] p-1 shadow-inner overflow-hidden transition-all duration-300`}
             >
               <div className="w-full h-full rounded-[3rem] overflow-hidden flex items-center justify-center bg-white/50 backdrop-blur-sm">
-                {previewUrl ? (
-                  <Image src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="flex flex-col items-center">
-                    <span className="text-6xl mb-2 drop-shadow-sm">{selectedIcon}</span>
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Add Image</span>
-                  </div>
-                )}
+                <div className="flex flex-col items-center">
+                  <span className="text-6xl mb-2 drop-shadow-sm">{selectedIcon}</span>
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Preview</span>
+                </div>
               </div>
-              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              </div>
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                className="hidden" 
-                accept="image/*" 
-                onChange={handleFileChange} 
-              />
             </div>
 
             <div className="w-full space-y-6">
               <div>
                 <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-4">Choose an Icon</label>
                 <div className="grid grid-cols-4 gap-3">
-                  {ICONS.map((icon,i) => (
+                  {ICONS.map((icon, i) => (
                     <button
                       key={`${icon}-${i}`}
                       type="button"
@@ -155,12 +126,12 @@ const CompanionBuilder: React.FC = () => {
           <div className="bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm space-y-6">
             <div>
               <label className={labelClass}>Companion Name</label>
-              <input 
-                type="text" 
-                className={inputClass} 
+              <input
+                type="text"
+                className={inputClass}
                 placeholder="e.g., Quantum Quinn"
                 value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
               />
             </div>
@@ -168,10 +139,10 @@ const CompanionBuilder: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className={labelClass}>Subject Category</label>
-                <select 
+                <select
                   className={inputClass}
                   value={formData.subject}
-                  onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                   required
                 >
                   <option value="">Select Subject</option>
@@ -185,10 +156,10 @@ const CompanionBuilder: React.FC = () => {
               </div>
               <div>
                 <label className={labelClass}>Language</label>
-                <select 
+                <select
                   className={inputClass}
                   value={formData.language}
-                  onChange={(e) => setFormData({...formData, language: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, language: e.target.value })}
                 >
                   <option>English</option>
                   <option>Spanish</option>
@@ -201,12 +172,12 @@ const CompanionBuilder: React.FC = () => {
 
             <div>
               <label className={labelClass}>Learning Topic</label>
-              <input 
-                type="text" 
-                className={inputClass} 
+              <input
+                type="text"
+                className={inputClass}
                 placeholder="e.g., The Laws of Thermodynamics"
                 value={formData.topic}
-                onChange={(e) => setFormData({...formData, topic: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
                 required
               />
             </div>
@@ -219,7 +190,7 @@ const CompanionBuilder: React.FC = () => {
                     <button
                       key={v}
                       type="button"
-                      onClick={() => setFormData({...formData, voiceType: v })}
+                      onClick={() => setFormData({ ...formData, voiceType: v })}
                       className={`flex-1 py-3 rounded-xl border text-sm font-medium transition-all ${formData.voiceType === v ? 'bg-[#2D2D2D] text-white border-[#2D2D2D]' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
                     >
                       {v}
@@ -229,10 +200,10 @@ const CompanionBuilder: React.FC = () => {
               </div>
               <div>
                 <label className={labelClass}>Speaking Tone</label>
-                <select 
+                <select
                   className={inputClass}
                   value={formData.style}
-                  onChange={(e) => setFormData({...formData, style: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, style: e.target.value })}
                 >
                   <option>Formal</option>
                   <option>Casual</option>
@@ -242,8 +213,8 @@ const CompanionBuilder: React.FC = () => {
               </div>
             </div>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={isSubmitting}
               className={`w-full bg-[#FF5B37] hover:bg-[#e64d2b] text-white font-bold py-5 rounded-2xl transition-all shadow-lg hover:shadow-orange-500/20 active:scale-[0.98] mt-4 flex items-center justify-center gap-3 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
