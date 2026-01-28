@@ -1,13 +1,12 @@
-
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
+import { Bricolage_Grotesque,  } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import { Providers } from "@/components/providers/SessionProvider";
 
 import { auth } from "@/lib/auth";
-const font = Outfit({
-  variable: "--font-outfit",
+const font = Bricolage_Grotesque({
+  variable: "--font-bricolage",
   subsets: ["latin"],
 });
 

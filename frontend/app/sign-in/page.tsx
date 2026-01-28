@@ -6,10 +6,10 @@ import { signIn } from 'next-auth/react';
 const SignIn: React.FC = () => {
   const [email, setEmail] = useState('');
 
-  const handleContinue = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await signIn('nodemailer', { email, redirectTo: "/companions/new" });
-  };
+  // const handleContinue = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   await signIn('nodemailer', { email, redirectTo: "/companions/new" });
+  // };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
@@ -25,7 +25,7 @@ const SignIn: React.FC = () => {
         <p className="text-gray-500 text-sm mb-8 text-center font-medium">Welcome back! Please sign in to continue</p>
 
         {/* Google Login */}
-        <button onClick={() => signIn('google', { redirectTo: "/" })} className="w-full flex items-center justify-center gap-3 py-3.5 border border-gray-200 cursor-pointer rounded-2xl hover:bg-gray-50 transition-colors mb-6 shadow-sm">
+        <button onClick={() => signIn('google', { redirectTo: "/companions/new" })} className="w-full flex items-center justify-center gap-3 py-3.5 border border-gray-200 cursor-pointer rounded-2xl hover:bg-gray-50 transition-colors mb-6 shadow-sm">
 
           <svg width="20" height="20" viewBox="0 0 24 24">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />

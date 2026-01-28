@@ -5,6 +5,8 @@ import React, { useState } from 'react';
 import Image from "next/image"
 import { COLORS } from '@/constants/constants';
 import { CreateCompanion } from '@/services/companion.services';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 const ICONS = ['🧠', '🧪', '➗', '⌨️', '📜', '📊', '💬', '🎨', '🌍', '♟️', '🔭', '📐', '🧬', '💡', '🚀'];
 
@@ -13,7 +15,7 @@ const CompanionBuilder: React.FC = () => {
   const [selectedColorKey, setSelectedColorKey] = useState<keyof typeof COLORS>('Science');
   const [showSuccess, setShowSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const router = useRouter()
   const [formData, setFormData] = useState({
     name: '',
     subject: '',
@@ -30,7 +32,11 @@ const CompanionBuilder: React.FC = () => {
     setIsSubmitting(true);
     try {
       const res = await CreateCompanion(formData);
-      console.log(res)
+      if (res.success){
+        router.push(`/companions/${res.data.id}`)
+      }else{
+         toast("Companion creation failed")
+      }
     } catch (error) {
       console.error(error)
 
