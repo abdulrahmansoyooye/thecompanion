@@ -22,7 +22,7 @@ const navItems = [
   { label: "Home", href: "/", icon: Home },
   { label: "Companion", href: "/companions", icon: Sparkles },
   { label: "My Journey", href: "/my-journey", icon: Compass },
-  { label: "Bookmarks", href: "/bookmarks", icon: Bookmark },
+  // { label: "Bookmarks", href: "/bookmarks", icon: Bookmark },
   { label: "Settings", href: "/settings", icon: Settings },
 ];
 

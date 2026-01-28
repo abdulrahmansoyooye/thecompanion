@@ -21,6 +21,9 @@ const CompanionCard: React.FC<CompanionCardProps> = ({ companion, compact }) => 
       </div>
 
       <div className="mb-4">
+        <span className="text-2xl">
+          {companion.icon}
+        </span>
         <h3 className="font-bold text-lg mb-1">{companion.name}</h3>
         <p className="text-gray-700 text-sm">Topic: {companion.topic}</p>
       </div>
