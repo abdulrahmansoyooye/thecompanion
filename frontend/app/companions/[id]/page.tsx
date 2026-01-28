@@ -67,16 +67,16 @@ const {data:session} = useSession()
     };
 
     const onCallEnd = async () => {
-      console.log("lesson ended")
       if (companion) {
         const res = await addToHistory(companion.id)
         console.log(res)
         if (res.ok) {
           toast.success("Conversation saved successfully")
-          router.push("/")
+          router.push("/my-journey")
+        }else{
+          toast.error("Conversation not saved")
         }
       }
-      toast.error("Conversation not saved")
       setCallStatus(CallStatus.INACTIVE)
 
     };
@@ -150,10 +150,9 @@ const {data:session} = useSession()
      console.log("lesson ended")
       if (companion) {
         const res = await addToHistory(companion.id)
-        console.log(res)
         if (res.success) {
           toast.success("Conversation saved successfully")
-          router.push("/")
+          router.push("/my-journey")
         }
       }
     

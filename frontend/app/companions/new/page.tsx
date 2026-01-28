@@ -35,11 +35,11 @@ const CompanionBuilder: React.FC = () => {
       if (res.success){
         router.push(`/companions/${res.data.id}`)
       }else{
-         toast("Companion creation failed")
+         toast.error("Companion creation failed")
       }
     } catch (error) {
       console.error(error)
-
+      toast.error("Companion creation failed")
     } finally {
       setIsSubmitting(false)
     }
