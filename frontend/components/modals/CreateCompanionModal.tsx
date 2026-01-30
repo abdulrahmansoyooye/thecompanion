@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { X, Sparkles, Wand2, MessageSquare, Mic2, Languages, Trophy } from 'lucide-react';
+import { X, Sparkles, Wand2, MessageSquare, Mic2, Languages, Trophy, Check } from 'lucide-react';
 import { CreateCompanion, updateCompanion } from '@/services/companion.services';
+import { COLORS } from '@/constants/constants';
 import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface CreateCompanionModalProps {
   isOpen: boolean;
@@ -12,16 +14,15 @@ interface CreateCompanionModalProps {
 }
 
 const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onClose, editData }) => {
-  const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     name: '',
     topic: '',
     subject: 'Science',
     voiceType: 'Rachel',
-    duration: '',
+    duration: '30',
     style: 'Friendly',
     language: 'English',
-    iconColor: "",
+    iconColor: COLORS.Science,
     icon: '🧪'
   });
 
@@ -30,24 +31,24 @@ const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onC
       setFormData({
         name: editData.name || '',
         topic: editData.topic || '',
-        duration: editData.duration || '',
+        duration: editData.duration || '30',
         subject: editData.subject || 'Science',
         voiceType: editData.voiceType || 'Rachel',
         style: editData.style || 'Friendly',
         language: editData.language || 'English',
-        iconColor: editData.iconColor || '',
+        iconColor: editData.iconColor || COLORS.Science,
         icon: editData.icon || '🧪'
       });
     } else {
       setFormData({
         name: '',
         topic: '',
-        duration: '',
+        duration: '30',
         subject: 'Science',
         voiceType: 'Rachel',
         style: 'Friendly',
         language: 'English',
-        iconColor: "",
+        iconColor: COLORS.Science,
         icon: '🧪'
       });
     }
@@ -69,72 +70,72 @@ const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onC
         toast.success("Companion created successfully!");
       }
       onClose();
-      // Use standard navigation if possible, but reload is fine for now as per code
       setTimeout(() => window.location.reload(), 500);
     } catch (error) {
-      // Error is already toasted in service layer
     }
   };
 
+  const labelClass = "text-xs font-black text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2 ml-1";
+  const inputClass = "w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-orange-500/5 focus:border-orange-500/20 transition-all text-sm font-semibold placeholder:text-gray-300";
+
   return (
-    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300"
-        onClick={onClose}
-      />
+    <AnimatePresence>
+      <div className="fixed inset-0 z-100 flex items-center justify-center p-6">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="absolute inset-0 bg-gray-900/40 backdrop-blur-md"
+          onClick={onClose}
+        />
 
-      {/* Modal Content */}
-      <div className="relative w-full max-w-xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-        {/* Header */}
-        <div className="px-8 pt-8 pb-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-[#FF5B37] rounded-xl flex items-center justify-center text-white">
-              <Sparkles size={20} />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">{editData ? 'Update' : 'Create'} Companion</h2>
-              <p className="text-xs text-gray-500 font-medium">{editData ? 'Modify your companion details' : 'Design your personalized AI tutor'}</p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <X size={20} className="text-gray-400" />
-          </button>
-        </div>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-8 pt-4">
-          <div className="space-y-6">
-            {/* Step 1: Identity */}
-            <div className="space-y-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 10 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 10 }}
+          className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+        >
+          {/* Header */}
+          <div className="px-8 pt-8 pb-4 flex items-center justify-between border-b border-gray-50">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-orange-50 text-[#FF5B37] rounded-xl flex items-center justify-center">
+                <Sparkles size={20} />
+              </div>
               <div>
-                <label className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
-                  <Wand2 size={16} className="text-[#FF5B37]" />
-                  What's their name?
-                </label>
+                <h2 className="text-xl font-bold text-gray-900 tracking-tight">{editData ? 'Update' : 'New'} Companion</h2>
+                <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{editData ? 'Adjust settings' : 'Design your perfect mentor'}</p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-lg transition-colors group"
+            >
+              <X size={18} className="text-gray-400 group-hover:text-gray-900 transition-colors" />
+            </button>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="p-8 space-y-6 max-h-[75vh] overflow-y-auto no-scrollbar">
+            <div className="space-y-5">
+              <div>
+                <label className={labelClass}>Mentors Name</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Neura, the Brainy Explorer"
-                  className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#FF5B37]/20 transition-all text-sm font-medium"
+                  placeholder="e.g. Professor Zephyr"
+                  className={inputClass}
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 />
               </div>
 
               <div>
-                <label className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
-                  <MessageSquare size={16} className="text-[#FF5B37]" />
-                  What will you learn together?
-                </label>
+                <label className={labelClass}>Core Topic</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Quantum Physics basics"
-                  className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#FF5B37]/20 transition-all text-sm font-medium"
+                  placeholder="e.g. History of Rome"
+                  className={inputClass}
                   value={formData.topic}
                   onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
                 />
@@ -142,12 +143,9 @@ const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onC
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
-                    <Trophy size={16} className="text-[#FF5B37]" />
-                    Subject
-                  </label>
+                  <label className={labelClass}>Domain</label>
                   <select
-                    className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#FF5B37]/20 transition-all text-sm font-medium appearance-none"
+                    className={`${inputClass} appearance-none cursor-pointer`}
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                   >
@@ -155,62 +153,81 @@ const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onC
                   </select>
                 </div>
                 <div>
-                  <label className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
-                    <Mic2 size={16} className="text-[#FF5B37]" />
-                    Voice
-                  </label>
+                  <label className={labelClass}>Session Goal</label>
                   <select
-                    className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#FF5B37]/20 transition-all text-sm font-medium appearance-none"
-                    value={formData.voiceType}
-                    onChange={(e) => setFormData({ ...formData, voiceType: e.target.value })}
+                    className={`${inputClass} appearance-none cursor-pointer`}
+                    value={formData.duration}
+                    onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
                   >
-                    <option value="Rachel">Rachel (Natural)</option>
-                    <option value="Josh">Josh (Deep)</option>
-                    <option value="Bella">Bella (Academic)</option>
+                    <option value="15">15 Minutes</option>
+                    <option value="30">30 Minutes</option>
+                    <option value="45">45 Minutes</option>
+                    <option value="60">1 Hour</option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-3">Choose an Icon</label>
-                <div className="flex flex-wrap gap-3">
+                <label className={labelClass}>Choose Theme</label>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(COLORS).map(([key, value]) => (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, iconColor: value })}
+                      className={`w-8 h-8 rounded-lg border-2 transition-all ${value.split(' ')[0]} ${formData.iconColor === value ? 'border-gray-900 scale-110 shadow-sm' : 'border-white'}`}
+                    >
+                      {formData.iconColor === value && <Check size={12} className="mx-auto text-gray-900" />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className={labelClass}>Choose Avatar</label>
+                <div className="grid grid-cols-6 gap-2">
                   {icons.map((icon) => (
                     <button
                       key={icon}
                       type="button"
                       onClick={() => setFormData({ ...formData, icon })}
-                      className={`w-12 h-12 flex items-center justify-center text-xl rounded-xl transition-all cursor-pointer ${formData.icon === icon
-                        ? 'bg-[#FF5B37] text-white shadow-lg scale-110'
-                        : 'bg-gray-50 hover:bg-gray-100 text-gray-600'
+                      className={`aspect-square flex items-center justify-center text-lg rounded-xl transition-all relative ${formData.icon === icon
+                        ? 'bg-gray-900 text-white shadow-md'
+                        : 'bg-gray-50 hover:bg-gray-100 text-gray-500 hover:text-gray-900'
                         }`}
                     >
                       {icon}
+                      {formData.icon === icon && (
+                        <div className="absolute -top-1 -right-1 bg-[#FF5B37] text-white rounded-full p-0.5 shadow-sm">
+                          <Check size={8} strokeWidth={4} />
+                        </div>
+                      )}
                     </button>
                   ))}
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="mt-10 flex gap-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 py-4 px-6 border border-gray-200 rounded-2xl font-bold text-gray-600 hover:bg-gray-50 transition-all active:scale-[0.98]"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="flex-2 py-4 px-6 bg-[#FF5B37] hover:bg-[#e64d2b] text-white font-extrabold rounded-2xl transition-all shadow-lg shadow-orange-500/10 active:scale-[0.98] flex items-center justify-center gap-2"
-            >
-              {editData ? 'Update' : 'Create'} Companion
-              <Sparkles size={18} />
-            </button>
-          </div>
-        </form>
+            <div className="flex gap-4 pt-4">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 py-3 px-4 bg-gray-50 text-gray-500 font-bold text-xs rounded-xl hover:bg-gray-100 transition-all active:scale-[0.98]"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="flex-[2] py-3 px-4 bg-[#FF5B37] text-white font-bold text-xs rounded-xl hover:bg-[#e64d2b] transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2 group"
+              >
+                {editData ? 'Update mentor' : 'Create mentor'}
+                <Sparkles size={14} className="group-hover:rotate-12 transition-transform" />
+              </button>
+            </div>
+          </form>
+        </motion.div>
       </div>
-    </div>
+    </AnimatePresence>
   );
 };
 

@@ -10,19 +10,19 @@ import {
   LogOut,
   User,
   Plus,
-  Bookmark,
   Settings,
+  X,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signOut } from "next-auth/react";
 import CreateCompanionModal from "../modals/CreateCompanionModal";
 import { usePathname } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 
 const navItems = [
   { label: "Home", href: "/", icon: Home },
-  { label: "Companion", href: "/companions", icon: Sparkles },
+  { label: "Companions", href: "/companions", icon: Sparkles },
   { label: "My Journey", href: "/my-journey", icon: Compass },
-  // { label: "Bookmarks", href: "/bookmarks", icon: Bookmark },
   { label: "Settings", href: "/settings", icon: Settings },
 ];
 
@@ -33,8 +33,17 @@ interface NavbarProps {
 const Navbar = ({ session }: NavbarProps) => {
   const [open, setOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const user = session?.user;
   const pathname = usePathname();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const isAuthPage = pathname === "/sign-in" || pathname === "/signup";
 
@@ -42,163 +51,210 @@ const Navbar = ({ session }: NavbarProps) => {
 
   return (
     <>
-      <nav className="navbar">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-[#FF5B37] rounded-lg flex items-center justify-center text-white font-bold">
-            TC
-          </div>
-          <span className="font-bold text-xl tracking-tight">The Companion</span>
-        </Link>
-
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-6">
-          {navItems.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              className="text-sm font-medium hover:opacity-70 transition text-gray-700"
-            >
-              {item.label}
-            </Link>
-          ))}
-
-          {user && (
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-1.5 px-4 py-2 bg-black text-white rounded-full text-xs font-bold hover:bg-black/80 transition shadow-sm active:scale-95 ml-2 cursor-pointer"
-            >
-              <Plus size={14} />
-              Create
-            </button>
-          )}
-
-          {user ? (
-            <div className="flex items-center gap-4 pl-4 border-l border-black/10">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-black/5 rounded-full flex items-center justify-center overflow-hidden">
-                  {user.image ? (
-                    <img
-                      src={user.image}
-                      alt={user.name || "User"}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <User size={16} />
-                  )}
-                </div>
-                <span className="text-sm font-medium">
-                  {user.name?.split(" ")[0] || "User"}
-                </span>
-              </div>
-              <button
-                onClick={() => {
-                  localStorage.setItem("manual_logout", "true");
-                  signOut({ redirectTo: "/sign-in" });
-                }}
-                className="text-sm font-medium hover:opacity-70 transition flex items-center gap-1 text-red-600 cursor-pointer"
-                title="Sign Out"
-              >
-                <LogOut size={16} />
-              </button>
+      <nav
+        className={`fixed top-0 left-0 right-0 z-100 transition-all duration-300 ${scrolled
+          ? "bg-white/80 backdrop-blur-xl border-b border-gray-100 py-3 shadow-sm"
+          : "bg-transparent py-5"
+          }`}
+      >
+        <div className="max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 flex items-center justify-between">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-10 h-10 bg-[#FF5B37] rounded-xl flex items-center justify-center text-white shadow-lg shadow-orange-500/20 group-hover:scale-105 transition-transform">
+              <Sparkles size={20} fill="currentColor" />
             </div>
-          ) : (
-            <Link href="/sign-in" className="btn-signin">
-              Sign In
-            </Link>
-          )}
-        </div>
+            <span className="font-extrabold text-xl tracking-tight text-gray-900">
+              The Companion
+            </span>
+          </Link>
 
-        {/* Mobile Controls */}
-        <div className="md:hidden flex items-center gap-3">
-          {user && (
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="p-2 bg-black text-white rounded-full cursor-pointer"
-            >
-              <Plus size={16} />
-            </button>
-          )}
-          <button
-            onClick={() => setOpen(!open)}
-            aria-label="Open menu"
-            className="rounded-border p-2 cursor-pointer"
-          >
-            <Menu size={20} />
-          </button>
-        </div>
-
-        {/* Mobile Dropdown */}
-        {open && (
-          <div className="absolute top-full right-0 mt-2 w-56 rounded-4xl border border-black bg-white shadow-sm z-50">
-            <div className="flex flex-col divide-y divide-black/10">
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-8">
+            <div className="flex items-center gap-1 bg-gray-100/50 p-1.5 rounded-2xl border border-gray-200/50">
               {navItems.map((item) => {
-                const Icon = item.icon;
-
+                const isActive = pathname === item.href;
                 return (
                   <Link
                     key={item.label}
                     href={item.href}
-                    onClick={() => setOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 text-sm hover:bg-black/5 transition"
+                    className={`relative px-4 py-2 text-sm font-semibold transition-all duration-300 rounded-xl ${isActive
+                      ? "text-gray-900"
+                      : "text-gray-500 hover:text-gray-700 hover:bg-gray-200/50"
+                      }`}
                   >
-                    <Icon size={18} />
-                    {item.label}
+                    {isActive && (
+                      <motion.div
+                        layoutId="nav-active"
+                        className="absolute inset-0 bg-white shadow-sm border border-gray-100 rounded-xl z-0"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                      />
+                    )}
+                    <span className="relative z-10">{item.label}</span>
                   </Link>
                 );
               })}
+            </div>
 
-              {user ? (
-                <>
-                  <div className="px-4 py-3 bg-black/5">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center border border-black/10 overflow-hidden">
-                        {user.image ? (
-                          <img
-                            src={user.image}
-                            alt={user.name || "User"}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <User size={16} />
-                        )}
-                      </div>
-                      <div className="overflow-hidden min-w-0">
-                        <p className="text-sm font-medium truncate">
-                          {user.name || "User"}
-                        </p>
-                        <p className="text-xs text-black/50 truncate">
-                          {user.email}
-                        </p>
-                      </div>
+            {user ? (
+              <div className="flex items-center gap-6 pl-4 border-l border-gray-200">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 border-2 border-[#FF5B37]/20 rounded-full p-0.5 overflow-hidden">
+                    <div className="w-full h-full bg-orange-50 rounded-full flex items-center justify-center overflow-hidden">
+                      {user.image ? (
+                        <img
+                          src={user.image}
+                          alt={user.name || "User"}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <User size={18} className="text-orange-500" />
+                      )}
                     </div>
                   </div>
-                  <button
-                    onClick={() => {
-                      setOpen(false);
-                      localStorage.setItem("manual_logout", "true");
-                      signOut();
-                    }}
-                    className="flex items-center gap-3 px-4 py-3 text-sm hover:bg-black/5 transition text-red-600 w-full text-left font-medium cursor-pointer"
-                  >
-                    <LogOut size={18} />
-                    Sign Out
-                  </button>
-                </>
-              ) : (
-                <Link
-                  href="/sign-in"
-                  onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 text-sm hover:bg-black/5 transition font-medium"
-                >
-                  <LogIn size={18} />
-                  Sign In
-                </Link>
-              )}
-            </div>
+                  <div>
+                    <p className="text-xs font-bold text-gray-900 leading-none">
+                      {user.name?.split(" ")[0] || "User"}
+                    </p>
+                    <button
+                      onClick={() => {
+                        localStorage.setItem("manual_logout", "true");
+                        signOut({ redirectTo: "/sign-in" });
+                      }}
+                      className="text-[10px] font-bold text-red-500 hover:underline transition-all mt-1 uppercase tracking-widest cursor-pointer"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <Link
+                href="/sign-in"
+                className="px-6 py-2.5 bg-gray-900 text-white rounded-xl text-sm font-bold hover:bg-gray-800 transition active:scale-95 cursor-pointer shadow-lg shadow-gray-200"
+              >
+                Sign In
+              </Link>
+            )}
           </div>
-        )}
+
+          {/* Mobile Menu Button */}
+          <div className="md:hidden flex items-center gap-3">
+            {user && (
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="w-10 h-10 bg-[#FF5B37] text-white rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 cursor-pointer"
+              >
+                <Plus size={20} />
+              </button>
+            )}
+            <button
+              onClick={() => setOpen(!open)}
+              className="w-10 h-10 bg-white border border-gray-200 text-gray-900 rounded-xl flex items-center justify-center hover:bg-gray-50 transition cursor-pointer"
+            >
+              {open ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Sidebar Navigation */}
+        <AnimatePresence>
+          {open && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setOpen(false)}
+                className="fixed inset-0 bg-black/50 backdrop-blur-sm z-110 md:hidden"
+              />
+              <motion.div
+                initial={{ x: "100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "100%" }}
+                transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                className="fixed top-0 right-0 h-full w-[280px] bg-white z-120 shadow-2xl p-8 md:hidden flex flex-col"
+              >
+                <div className="flex items-center gap-3 mb-12">
+                  <div className="w-10 h-10 bg-[#FF5B37] rounded-xl flex items-center justify-center text-white">
+                    <Sparkles size={20} fill="currentColor" />
+                  </div>
+                  <span className="font-extrabold text-lg text-gray-900">
+                    Menu
+                  </span>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  {navItems.map((item) => {
+                    const isActive = pathname === item.href;
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.label}
+                        href={item.href}
+                        onClick={() => setOpen(false)}
+                        className={`flex items-center gap-4 px-5 py-4 rounded-2xl transition-all ${isActive
+                          ? "bg-orange-50 text-[#FF5B37] font-bold"
+                          : "text-gray-500 hover:bg-gray-50 font-medium"
+                          }`}
+                      >
+                        <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                        {item.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-auto pt-8 border-t border-gray-100">
+                  {user ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3 px-2">
+                        <div className="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center overflow-hidden border-2 border-orange-100">
+                          {user.image ? (
+                            <img
+                              src={user.image}
+                              alt={user.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <User size={24} className="text-orange-500" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-bold text-gray-900 truncate">
+                            {user.name}
+                          </p>
+                          <p className="text-xs text-gray-500 truncate">
+                            {user.email}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => signOut()}
+                        className="w-full flex items-center justify-center gap-2 py-4 bg-gray-50 text-red-500 font-bold rounded-2xl hover:bg-red-50 transition-colors cursor-pointer"
+                      >
+                        <LogOut size={18} />
+                        Sign Out
+                      </button>
+                    </div>
+                  ) : (
+                    <Link
+                      href="/sign-in"
+                      onClick={() => setOpen(false)}
+                      className="w-full flex items-center justify-center gap-2 py-4 bg-[#FF5B37] text-white font-bold rounded-2xl hover:bg-[#e64d2b] transition shadow-lg shadow-orange-500/20 cursor-pointer"
+                    >
+                      <LogIn size={18} />
+                      Sign In
+                    </Link>
+                  )}
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </nav>
+
+      {/* Spacer to prevent content from going behind navbar */}
+      <div className="h-20" />
 
       <CreateCompanionModal
         isOpen={isModalOpen}
@@ -207,6 +263,5 @@ const Navbar = ({ session }: NavbarProps) => {
     </>
   );
 };
-
 
 export default Navbar;

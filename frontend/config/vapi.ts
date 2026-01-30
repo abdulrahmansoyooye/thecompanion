@@ -11,7 +11,7 @@ interface UserConfig {
 
 export const getAssistantConfig = (companion: CompanionConfig, user: UserConfig | null | undefined) => ({
     name: companion.name || "AI Tutor",
-    firstMessage: `Hello, ${user?.name}, let's start the session, I'm ${companion.name || "your tutor"}. Can we start discussing ${companion.topic || "the topic"} or would you like to chat a bit first?`,
+    firstMessage: `Hello, ${user?.name?.split(" ")[0]}, let's start the session, I'm ${companion.name || "your tutor"}. Are you ready to start the session?`,
     transcriber: {
         provider: "deepgram",
         model: "nova-2",
