@@ -65,36 +65,36 @@ const CompanionBuilder: React.FC = () => {
   const labelClass = "flex items-center gap-2 text-xs font-black text-gray-400 uppercase tracking-[0.15em] mb-3 ml-1";
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12 md:py-20 lg:py-24">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-20 lg:py-24">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-16 space-y-4"
+        className="text-center mb-10 md:mb-16 space-y-4"
       >
         <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-orange-50 text-[#FF5B37] rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm">
           <Sparkles size={12} />
           Forge Your Mentor
         </span>
-        <h1 className="text-4xl md:text-6xl font-black text-gray-900 tracking-tighter">
+        <h1 className="text-3xl md:text-6xl font-black text-gray-900 tracking-tighter">
           Companion Builder
         </h1>
-        <p className="text-gray-500 max-w-2xl mx-auto text-lg md:text-xl font-medium leading-relaxed">
+        <p className="text-gray-500 max-w-2xl mx-auto text-base md:text-xl font-medium leading-relaxed">
           Design an intelligent presence that understands your goals and speaks your language.
         </p>
       </motion.div>
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
         {/* Visual Identity Panel */}
         <motion.div
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="lg:col-span-5 space-y-8 sticky top-32"
+          className="lg:col-span-5 space-y-8 lg:sticky lg:top-32"
         >
-          <div className="bg-white p-10 rounded-[3.5rem] border border-gray-100 shadow-2xl shadow-gray-200/50 flex flex-col items-center relative overflow-hidden group">
+          <div className="bg-white p-6 md:p-10 rounded-3xl md:rounded-[3.5rem] border border-gray-100 shadow-2xl shadow-gray-200/50 flex flex-col items-center relative overflow-hidden group">
             <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-[#FF5B37]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
-            <h2 className="text-sm font-black text-gray-900 mb-10 uppercase tracking-widest">Visual Identity</h2>
+            <h2 className="text-xs md:text-sm font-black text-gray-900 mb-6 md:mb-10 uppercase tracking-widest">Visual Identity</h2>
 
             <AnimatePresence mode="wait">
               <motion.div
@@ -102,36 +102,36 @@ const CompanionBuilder: React.FC = () => {
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 1.1, opacity: 0 }}
-                className={`relative w-56 h-56 mb-12 ${COLORS[selectedColorKey]} border-4 rounded-[4rem] p-1.5 shadow-2xl transition-all duration-500`}
+                className={`relative w-40 h-40 md:w-56 md:h-56 mb-8 md:mb-12 ${COLORS[selectedColorKey]} border-4 rounded-[2.5rem] md:rounded-[4rem] p-1 shadow-2xl transition-all duration-500`}
               >
-                <div className="w-full h-full rounded-[3.5rem] overflow-hidden flex items-center justify-center bg-white/60 backdrop-blur-md">
-                  <span className="text-8xl drop-shadow-2xl filter saturate-150">{selectedIcon}</span>
+                <div className="w-full h-full rounded-[2.2rem] md:rounded-[3.5rem] overflow-hidden flex items-center justify-center bg-white/60 backdrop-blur-md">
+                  <span className="text-6xl md:text-8xl drop-shadow-2xl filter saturate-150">{selectedIcon}</span>
                 </div>
-                <div className="absolute -bottom-4 bg-white px-6 py-2 rounded-2xl shadow-xl border border-gray-50 flex items-center gap-2">
-                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                  <span className="text-[10px] font-black text-gray-900 uppercase tracking-widest">Active Link</span>
+                <div className="absolute -bottom-3 md:-bottom-4 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-auto md:right-auto bg-white px-4 py-1.5 md:px-6 md:py-2 rounded-xl md:rounded-2xl shadow-xl border border-gray-50 flex items-center gap-2 whitespace-nowrap">
+                  <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-green-500 rounded-full animate-pulse" />
+                  <span className="text-[8px] md:text-[10px] font-black text-gray-900 uppercase tracking-widest">Active Link</span>
                 </div>
               </motion.div>
             </AnimatePresence>
 
-            <div className="w-full space-y-10">
+            <div className="w-full space-y-8 md:space-y-10">
               <div>
                 <label className={labelClass}>
                   Choose Avatar
                   <span className="text-[#FF5B37] text-lg leading-none">•</span>
                 </label>
-                <div className="grid grid-cols-5 gap-3">
+                <div className="grid grid-cols-5 gap-2 md:gap-3">
                   {ICONS.map((icon, i) => (
                     <button
                       key={`${icon}-${i}`}
                       type="button"
                       onClick={() => setSelectedIcon(icon)}
-                      className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-all duration-300 ${selectedIcon === icon
+                      className={`aspect-square flex items-center justify-center rounded-xl md:rounded-2xl transition-all duration-300 ${selectedIcon === icon
                         ? 'bg-gray-900 text-white scale-110 shadow-xl'
-                        : 'bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600'
+                        : 'bg-gray-50 text-gray-400 hover:bg-gray-100'
                         }`}
                     >
-                      <span className="text-xl">{icon}</span>
+                      <span className="text-lg md:text-xl">{icon}</span>
                     </button>
                   ))}
                 </div>
@@ -142,13 +142,13 @@ const CompanionBuilder: React.FC = () => {
                   Core Palette
                   <span className="text-[#FF5B37] text-lg leading-none">•</span>
                 </label>
-                <div className="flex flex-wrap gap-4">
+                <div className="flex flex-wrap gap-3 md:gap-4">
                   {(Object.keys(COLORS) as Array<keyof typeof COLORS>).map(key => (
                     <button
                       key={key}
                       type="button"
                       onClick={() => setSelectedColorKey(key)}
-                      className={`w-10 h-10 rounded-2xl border-2 transition-all duration-300 relative group/color ${COLORS[key].split(' ')[0]
+                      className={`w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl border-2 transition-all duration-300 relative group/color ${COLORS[key].split(' ')[0]
                         } ${selectedColorKey === key
                           ? 'border-gray-900 scale-125 shadow-lg'
                           : 'border-white hover:scale-110'
@@ -156,10 +156,10 @@ const CompanionBuilder: React.FC = () => {
                     >
                       {selectedColorKey === key && (
                         <div className="absolute inset-0 flex items-center justify-center text-gray-900">
-                          <Check size={14} strokeWidth={3} />
+                          <Check size={12} strokeWidth={3} />
                         </div>
                       )}
-                      <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover/color:opacity-100 transition-opacity text-[8px] font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">
+                      <span className="hidden md:block absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover/color:opacity-100 transition-opacity text-[8px] font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">
                         {key}
                       </span>
                     </button>
@@ -175,20 +175,20 @@ const CompanionBuilder: React.FC = () => {
           initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
-          className="lg:col-span-7 space-y-10"
+          className="lg:col-span-7 space-y-8 md:space-y-10"
         >
-          <div className="bg-white p-12 rounded-[3.5rem] border border-gray-100 shadow-sm space-y-10">
+          <div className="bg-white p-6 md:p-12 rounded-3xl md:rounded-[3.5rem] border border-gray-100 shadow-sm space-y-8 md:space-y-10">
             <div className="flex items-center gap-4 mb-2">
-              <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-900">
-                <MessageSquare size={24} />
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-50 rounded-xl md:rounded-2xl flex items-center justify-center text-gray-900">
+                <MessageSquare size={20} />
               </div>
               <div>
-                <h2 className="text-xl font-black text-gray-900 tracking-tight">Configuration</h2>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Setup behavior & personality</p>
+                <h2 className="text-lg md:text-xl font-black text-gray-900 tracking-tight">Configuration</h2>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Setup behavior & personality</p>
               </div>
             </div>
 
-            <div className="space-y-8">
+            <div className="space-y-6 md:space-y-8">
               <div>
                 <label className={labelClass}>Companion Name</label>
                 <input
@@ -201,7 +201,7 @@ const CompanionBuilder: React.FC = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <div>
                   <label className={labelClass}>Subject Domain</label>
                   <div className="relative">
@@ -262,7 +262,7 @@ const CompanionBuilder: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <div>
                   <label className={labelClass}>Voice Identity</label>
                   <div className="flex p-1.5 bg-gray-50 rounded-2xl border border-gray-100">
@@ -271,8 +271,8 @@ const CompanionBuilder: React.FC = () => {
                         key={v}
                         type="button"
                         onClick={() => setFormData({ ...formData, voiceType: v })}
-                        className={`flex-1 py-3.5 rounded-[1rem] text-xs font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 ${formData.voiceType === v
-                          ? 'bg-white text-gray-900 shadow-lg shadow-gray-200/50 scale-[1.02]'
+                        className={`flex-1 py-3 md:py-3.5 rounded-xl md:rounded-[1rem] text-[10px] md:text-xs font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 ${formData.voiceType === v
+                          ? 'bg-white text-gray-900 shadow-lg shadow-gray-200/50'
                           : 'text-gray-400 hover:text-gray-600'
                           }`}
                       >
@@ -306,32 +306,32 @@ const CompanionBuilder: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`group w-full bg-gray-900 hover:bg-black text-white font-black py-6 rounded-3xl transition-all duration-300 shadow-2xl shadow-gray-300 flex items-center justify-center gap-4 relative overflow-hidden active:scale-[0.98] ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
+              className={`group w-full bg-gray-900 hover:bg-black text-white font-black py-5 md:py-6 rounded-2xl md:rounded-3xl transition-all duration-300 shadow-xl flex items-center justify-center gap-4 relative overflow-hidden active:scale-[0.98] ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
                 }`}
             >
               {isSubmitting ? (
                 <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span className="uppercase tracking-widest text-xs">Architecting Companion...</span>
+                  <div className="w-4 h-4 md:w-5 md:h-5 border-2 md:border-3 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span className="uppercase tracking-widest text-[10px] md:text-xs">Architecting...</span>
                 </div>
               ) : (
                 <>
-                  <span className="uppercase tracking-[0.2em] text-sm">Generate My Companion</span>
-                  <div className="w-8 h-8 bg-orange-500 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform shadow-lg shadow-orange-500/20">
-                    <Sparkles size={16} fill="currentColor" />
+                  <span className="uppercase tracking-[0.1em] md:tracking-[0.2em] text-xs md:text-sm">Generate Companion</span>
+                  <div className="w-7 h-7 md:w-8 md:h-8 bg-orange-500 rounded-lg md:rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform shadow-lg shadow-orange-500/20">
+                    <Sparkles size={14} md:size={16} fill="currentColor" />
                   </div>
                 </>
               )}
             </button>
           </div>
 
-          <div className="bg-orange-50 rounded-[2.5rem] p-8 border border-orange-100/50 flex items-center gap-6">
-            <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-sm">
-              <Sparkles className="text-orange-500" />
+          <div className="bg-orange-50 rounded-3xl md:rounded-[2.5rem] p-6 md:p-8 border border-orange-100 flex items-center gap-4 md:gap-6">
+            <div className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-xl md:rounded-2xl flex items-center justify-center shrink-0 shadow-sm">
+              <Sparkles className="text-orange-500" size={20} />
             </div>
             <div className="flex-1">
-              <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">AI Recommendation</p>
-              <p className="text-gray-700 text-sm font-medium">Use a <span className="text-gray-900 font-extrabold">Socratic</span> style for deep learning topics, or <span className="text-gray-900 font-extrabold">Cheerful</span> for quick vocabulary drills.</p>
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5 md:mb-1">AI Recommendation</p>
+              <p className="text-gray-700 text-xs md:text-sm font-medium">Use a <span className="text-gray-900 font-bold">Socratic</span> style for deep learning, or <span className="text-gray-900 font-bold">Cheerful</span> for quick drills.</p>
             </div>
           </div>
         </motion.div>
