@@ -45,7 +45,7 @@ const MyJourney: React.FC = () => {
               </div>
               <div>
                 <h1 className="text-3xl font-extrabold text-gray-900">{session?.user?.name || 'User'}</h1>
-                <p className="text-gray-500 font-medium">{session?.user?.email}</p>
+                <p className="text-gray-500 font-small">{session?.user?.email}</p>
               </div>
             </>
           )}
@@ -55,7 +55,7 @@ const MyJourney: React.FC = () => {
           {loading ? (
             <StatsSkeleton />
           ) : (
-            <>
+            <div className='md:flex space-y-4'>
               <div className="bg-white border border-gray-200 p-6 rounded-4xl shadow-sm flex items-center gap-4 min-w-[200px]">
                  <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-[#FF5B37] border border-red-100">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z" /><path d="M6 12v5c3 3 9 3 12 0v-5" /></svg>
@@ -66,17 +66,17 @@ const MyJourney: React.FC = () => {
                 </div>
               </div>
 
-              <div className="bg-white border border-gray-200 p-6 rounded-4xl shadow-sm flex items-center gap-4 min-w-[200px]">
+              <div className="bg-white border border-gray-200 p-6 rounded-4xl shadow-sm flex  items-center gap-4 min-w-[200px]">
                
                 <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500 border border-orange-100">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
                 </div>
                 <div>
                   <div className="text-2xl font-bold">{history.reduce((total, lesson)=> total + Number(lesson.duration),0)}</div>
-                  <div className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Hours Spent</div>
+                  <div className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Minutes Spent</div>
                 </div>
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>

@@ -19,7 +19,7 @@ const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onC
     topic: '',
     subject: 'Science',
     voiceType: 'Rachel',
-    duration: '30',
+    duration: 30,
     style: 'Friendly',
     language: 'English',
     iconColor: COLORS.Science,
@@ -43,7 +43,7 @@ const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onC
       setFormData({
         name: '',
         topic: '',
-        duration: '30',
+        duration: 30,
         subject: 'Science',
         voiceType: 'Rachel',
         style: 'Friendly',
@@ -57,7 +57,7 @@ const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onC
   if (!isOpen) return null;
 
   const subjects = ['Science', 'Maths', 'Language', 'Coding', 'History', 'Business', 'Economics', 'Geography', 'Finance'];
-  const icons = ['🧪', '➗', '🗣️', '⌨️', '📜', '💼', '📊', '🗺️', '💰', '🤖', '🎨', '🪐'];
+  const icons = ['🧪', '➗', '🗣️', '⌨️', '📜', '💼', '📊', '🗺️', '💰', '🎨', '🪐'];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,7 +80,7 @@ const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onC
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-100 flex items-center justify-center p-6">
+      <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -157,7 +157,7 @@ const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onC
                   <select
                     className={`${inputClass} appearance-none cursor-pointer`}
                     value={formData.duration}
-                    onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) })}
                   >
                     <option value="15">15 Minutes</option>
                     <option value="30">30 Minutes</option>

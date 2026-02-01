@@ -45,19 +45,34 @@ const Navbar = ({ session }: NavbarProps) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    const lock = open || isModalOpen;
+    if (lock) {
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    };
+  }, [open, isModalOpen]);
+
   const isAuthPage = pathname === "/sign-in" || pathname === "/signup";
 
   if (isAuthPage) return null;
 
+  const navBackground = scrolled || open ? "bg-white/80 backdrop-blur-xl border-b border-gray-100 py-3 shadow-sm" : "bg-transparent py-5";
+
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-100 transition-all duration-300 ${scrolled
-          ? "bg-white/80 backdrop-blur-xl border-b border-gray-100 py-3 shadow-sm"
-          : "bg-transparent py-5"
-          }`}
+        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${navBackground}`}
       >
         <div className="max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 flex items-center justify-between">
+
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-10 h-10 bg-[#FF5B37] rounded-xl flex items-center justify-center text-white shadow-lg shadow-orange-500/20 group-hover:scale-105 transition-transform">
@@ -155,103 +170,103 @@ const Navbar = ({ session }: NavbarProps) => {
             </button>
           </div>
         </div>
-
-        {/* Mobile Sidebar Navigation */}
-        <AnimatePresence>
-          {open && (
-            <>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setOpen(false)}
-                className="fixed inset-0 bg-black/50 backdrop-blur-sm z-110 md:hidden"
-              />
-              <motion.div
-                initial={{ x: "100%" }}
-                animate={{ x: 0 }}
-                exit={{ x: "100%" }}
-                transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                className="fixed top-0 right-0 h-full w-[280px] bg-white z-120 shadow-2xl p-8 md:hidden flex flex-col"
-              >
-                <div className="flex items-center gap-3 mb-12">
-                  <div className="w-10 h-10 bg-[#FF5B37] rounded-xl flex items-center justify-center text-white">
-                    <Sparkles size={20} fill="currentColor" />
-                  </div>
-                  <span className="font-extrabold text-lg text-gray-900">
-                    Menu
-                  </span>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  {navItems.map((item) => {
-                    const isActive = pathname === item.href;
-                    const Icon = item.icon;
-                    return (
-                      <Link
-                        key={item.label}
-                        href={item.href}
-                        onClick={() => setOpen(false)}
-                        className={`flex items-center gap-4 px-5 py-4 rounded-2xl transition-all ${isActive
-                          ? "bg-orange-50 text-[#FF5B37] font-bold"
-                          : "text-gray-500 hover:bg-gray-50 font-medium"
-                          }`}
-                      >
-                        <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
-                        {item.label}
-                      </Link>
-                    );
-                  })}
-                </div>
-
-                <div className="mt-auto pt-8 border-t border-gray-100">
-                  {user ? (
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-3 px-2">
-                        <div className="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center overflow-hidden border-2 border-orange-100">
-                          {user.image ? (
-                            <img
-                              src={user.image}
-                              alt={user.name}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <User size={24} className="text-orange-500" />
-                          )}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="font-bold text-gray-900 truncate">
-                            {user.name}
-                          </p>
-                          <p className="text-xs text-gray-500 truncate">
-                            {user.email}
-                          </p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => signOut()}
-                        className="w-full flex items-center justify-center gap-2 py-4 bg-gray-50 text-red-500 font-bold rounded-2xl hover:bg-red-50 transition-colors cursor-pointer"
-                      >
-                        <LogOut size={18} />
-                        Sign Out
-                      </button>
-                    </div>
-                  ) : (
-                    <Link
-                      href="/sign-in"
-                      onClick={() => setOpen(false)}
-                      className="w-full flex items-center justify-center gap-2 py-4 bg-[#FF5B37] text-white font-bold rounded-2xl hover:bg-[#e64d2b] transition shadow-lg shadow-orange-500/20 cursor-pointer"
-                    >
-                      <LogIn size={18} />
-                      Sign In
-                    </Link>
-                  )}
-                </div>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
       </nav>
+
+      {/* Mobile Sidebar Navigation */}
+      <AnimatePresence>
+        {open && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setOpen(false)}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[110] md:hidden"
+            />
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed top-0 right-0 h-full w-[280px] bg-white z-[120] shadow-2xl p-8 md:hidden flex flex-col"
+            >
+              <div className="flex items-center gap-3 mb-12">
+                <div className="w-10 h-10 bg-[#FF5B37] rounded-xl flex items-center justify-center text-white">
+                  <Sparkles size={20} fill="currentColor" />
+                </div>
+                <span className="font-extrabold text-lg text-gray-900">
+                  Menu
+                </span>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                {navItems.map((item) => {
+                  const isActive = pathname === item.href;
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.label}
+                      href={item.href}
+                      onClick={() => setOpen(false)}
+                      className={`flex items-center gap-4 px-5 py-4 rounded-2xl transition-all ${isActive
+                        ? "bg-orange-50 text-[#FF5B37] font-bold"
+                        : "text-gray-500 hover:bg-gray-50 font-medium"
+                        }`}
+                    >
+                      <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </div>
+
+              <div className="mt-auto pt-8 border-t border-gray-100">
+                {user ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3 px-2">
+                      <div className="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center overflow-hidden border-2 border-orange-100">
+                        {user.image ? (
+                          <img
+                            src={user.image}
+                            alt={user.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <User size={24} className="text-orange-500" />
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-bold text-gray-900 truncate">
+                          {user.name}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">
+                          {user.email}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => signOut()}
+                      className="w-full flex items-center justify-center gap-2 py-4 bg-gray-50 text-red-500 font-bold rounded-2xl hover:bg-red-50 transition-colors cursor-pointer"
+                    >
+                      <LogOut size={18} />
+                      Sign Out
+                    </button>
+                  </div>
+                ) : (
+                  <Link
+                    href="/sign-in"
+                    onClick={() => setOpen(false)}
+                    className="w-full flex items-center justify-center gap-2 py-4 bg-[#FF5B37] text-white font-bold rounded-2xl hover:bg-[#e64d2b] transition shadow-lg shadow-orange-500/20 cursor-pointer"
+                  >
+                    <LogIn size={18} />
+                    Sign In
+                  </Link>
+                )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Spacer to prevent content from going behind navbar */}
       <div className="h-20" />
