@@ -318,7 +318,7 @@ const CompanionBuilder: React.FC = () => {
                 <>
                   <span className="uppercase tracking-[0.1em] md:tracking-[0.2em] text-xs md:text-sm">Generate Companion</span>
                   <div className="w-7 h-7 md:w-8 md:h-8 bg-orange-500 rounded-lg md:rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform shadow-lg shadow-orange-500/20">
-                    <Sparkles size={14} md:size={16} fill="currentColor" />
+                    <Sparkles size={14} fill="currentColor" />
                   </div>
                 </>
               )}
