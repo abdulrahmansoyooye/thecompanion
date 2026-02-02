@@ -6,6 +6,8 @@ import { CreateCompanion, updateCompanion } from '@/services/companion.services'
 import { COLORS } from '@/constants/constants';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+// import {navigate} from 'next/router';
 
 interface CreateCompanionModalProps {
   isOpen: boolean;
@@ -25,7 +27,7 @@ const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onC
     iconColor: COLORS.Science,
     icon: '🧪'
   });
-
+const router = useRouter()
   useEffect(() => {
     if (editData) {
       setFormData({
@@ -66,7 +68,8 @@ const CreateCompanionModal: React.FC<CreateCompanionModalProps> = ({ isOpen, onC
         await updateCompanion(editData.id, formData);
         toast.success("Companion updated successfully!");
       } else {
-        await CreateCompanion(formData);
+       const res =  await CreateCompanion(formData);
+        router.push(`/companions/${res.id}`)
         toast.success("Companion created successfully!");
       }
       onClose();
