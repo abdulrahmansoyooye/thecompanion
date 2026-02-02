@@ -1,4 +1,4 @@
-# 🤖 The Companion
+#  The Companion
 
 > **Real-time AI Conversation Platform for Students and Developers.**
 
@@ -14,7 +14,7 @@
 
 ## ✨ Features
 
-- **🎭 Personalized AI Companions**: Create and customize your own AI companions. Tailor their name, personality, voice, and even the subject they specialize in.
+- ** Personalized AI Companions**: Create and customize your own AI companions. Tailor their name, personality, voice, and even the subject they specialize in.
 - **🎙️ Real-time Voice Interaction**: Experience ultra-low latency voice conversations powered by Vapi AI.
 - **📜 Learning Journey**: Track your growth and past interactions through an intuitive history dashboard.
 - **🔖 Bookmark & Save**: Keep track of your favorite companions for quick access.
