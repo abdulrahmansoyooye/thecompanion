@@ -51,14 +51,19 @@ const LessonRoom: React.FC = () => {
   const { data: session } = useSession();
   const [isMicOn, setIsMicOn] = useState(true);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [volume, setVolume] = useState(0);
   const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
   const [messages, setMessages] = useState<SavedMessage[]>([]);
   const router = useRouter();
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Auto-scroll transcription
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = 0;
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
     }
   }, [messages]);
 
@@ -86,47 +91,45 @@ const LessonRoom: React.FC = () => {
     const onCallStart = () => {
       setCallStatus(CallStatus.ACTIVE);
       setIsMicOn(true);
-      toast.success("Session started");
+      toast.success("Session connected");
     };
 
-    const onCallEnd = async () => {
-      setCallStatus(CallStatus.INACTIVE);
+    const onCallEnd = () => {
+      setCallStatus(CallStatus.FINISHED);
+      setTimeout(() => setCallStatus(CallStatus.INACTIVE), 2000);
+      setIsSpeaking(false);
+      setVolume(0);
       toast.info("Session ended");
     };
 
-    const onSpeechStart = () => setIsSpeaking(true);
-    const onSpeechEnd = () => setIsSpeaking(false);
-
-    const onError = (error: Error) => {
+    const onError = (error: any) => {
       console.error("Vapi Error:", error);
-      toast.error("Connection Error", {
-        description: error.message || "An error occurred during the session."
+      toast.error("Connection issue encountered", {
+        description: "Attempting to stabilize connection..."
       });
       setCallStatus(CallStatus.INACTIVE);
+      setIsSpeaking(false);
+      setVolume(0);
     };
 
     const onMessage = (message: Message) => {
       if (message.type === "transcript" && message.transcriptType === "final" && message.transcript && message.role) {
         const newMessage: SavedMessage = { role: message.role, content: message.transcript };
-        setMessages((prev) => [newMessage, ...prev]);
+        setMessages((prev) => [...prev, newMessage]);
       }
     };
 
     vapi.on("call-start", onCallStart);
     vapi.on("message", onMessage);
-    vapi.on("speech-start", onSpeechStart);
-    vapi.on("speech-end", onSpeechEnd);
+    vapi.on("speech-start", () => setIsSpeaking(true));
+    vapi.on("speech-end", () => setIsSpeaking(false));
+    vapi.on("volume-level", (level: number) => setVolume(level));
     vapi.on("error", onError);
     vapi.on("call-end", onCallEnd);
 
     return () => {
-      vapi.off("call-start", onCallStart);
-      vapi.off("message", onMessage);
-      vapi.off("speech-start", onSpeechStart);
-      vapi.off("speech-end", onSpeechEnd);
-      vapi.off("error", onError);
-      vapi.off("call-end", onCallEnd);
       vapi.stop();
+      vapi.removeAllListeners();
     };
   }, [id]);
 
@@ -140,7 +143,6 @@ const LessonRoom: React.FC = () => {
 
   const handleStart = async () => {
     if (!companion) return;
-
     setCallStatus(CallStatus.CONNECTING);
     try {
       const { getAssistantConfig } = await import('@/config/vapi');
@@ -158,9 +160,8 @@ const LessonRoom: React.FC = () => {
     if (companion) {
       try {
         await addToHistory(companion.id);
-        toast.success("Progress saved");
       } catch (e) {
-        console.error("Progress save failed");
+        console.error("History sync failed");
       }
     }
     setCallStatus(CallStatus.INACTIVE);
@@ -175,157 +176,205 @@ const LessonRoom: React.FC = () => {
   if (loading || !companion) return <LessonSkeleton />;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-slate-50 flex flex-col overflow-hidden">
       {/* Header */}
-      <nav className="w-full bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between shrink-0">
+      <nav className="w-full bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4 flex items-center justify-between z-50">
         <div className="flex items-center gap-4">
           <button
             onClick={() => router.back()}
-            className="p-2 hover:bg-gray-50 text-gray-400 hover:text-gray-900 rounded-lg transition-colors"
+            className="p-2 hover:bg-slate-100 text-slate-500 hover:text-slate-900 rounded-full transition-all duration-300"
           >
             <ArrowLeft size={18} />
           </button>
-          <div className="h-4 w-px bg-gray-100" />
           <div className="flex items-center gap-3">
-            <div className={`w-8 h-8 ${companion.iconColor} rounded-lg flex items-center justify-center text-sm`}>
+            <div className={`w-10 h-10 ${companion.iconColor} rounded-full flex items-center justify-center text-xl shadow-inner`}>
               {companion.icon}
             </div>
             <div>
-              <h2 className="text-xs font-black text-gray-900 uppercase tracking-tight leading-none mb-1">{companion.name}</h2>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">{companion.subject}</p>
+              <h2 className="text-sm font-bold text-slate-900 tracking-tight">{companion.name}</h2>
+              <p className="text-[11px] font-medium text-slate-500">{companion.subject} • {companion.topic}</p>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-lg border border-gray-100">
-            <div className={`w-1.5 h-1.5 rounded-full ${callStatus === CallStatus.ACTIVE ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`} />
-            <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{callStatus === CallStatus.ACTIVE ? 'Live session' : 'Standby'}</span>
-          </div>
+        <div className={`px-4 py-1.5 rounded-full border transition-all duration-500 flex items-center gap-2 ${callStatus === CallStatus.ACTIVE ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-slate-50 border-slate-100 text-slate-400'
+          }`}>
+          <div className={`w-1.5 h-1.5 rounded-full ${callStatus === CallStatus.ACTIVE ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`} />
+          <span className="text-[10px] font-bold uppercase tracking-wider">
+            {callStatus === CallStatus.ACTIVE ? 'Live Session' : callStatus === CallStatus.CONNECTING ? 'Connecting...' : 'Standby'}
+          </span>
         </div>
       </nav>
 
-      {/* Content */}
-      <main className="flex-1 max-w-5xl w-full mx-auto p-6 flex flex-col items-center justify-center gap-10">
-        <div className="relative">
-          {/* Subtle Speaker Aura */}
+      {/* Main Content Area */}
+      <main className="flex-1 relative flex flex-col items-center justify-center p-6 sm:p-12 overflow-hidden">
+        {/* Animated Background Orbs */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: callStatus === CallStatus.ACTIVE ? [0.05, 0.1, 0.05] : 0
+            }}
+            transition={{ duration: 8, repeat: Infinity }}
+            className={`absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full blur-[120px] ${companion.iconColor.split(' ')[0]}`}
+          />
+        </div>
+
+        {/* Companion Avatar */}
+        <div className="relative z-10 mb-8 mt-[-10vh]">
+          {/* Pulsing rings when talking */}
           <AnimatePresence>
-            {isSpeaking && (
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1.2, opacity: 0.1 }}
-                exit={{ scale: 1.3, opacity: 0 }}
-                transition={{ repeat: Infinity, duration: 1, ease: "easeOut" }}
-                className={`absolute inset-0 ${companion.iconColor.split(' ')[0]} rounded-3xl`}
-              />
+            {(isSpeaking || volume > 0.05) && (
+              <>
+                <motion.div
+                  initial={{ scale: 1, opacity: 0.5 }}
+                  animate={{ scale: 1.5 + (volume * 2), opacity: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeOut" }}
+                  className={`absolute inset-0 rounded-full border-2 ${companion.iconColor.split(' ')[0]} opacity-20`}
+                />
+                <motion.div
+                  initial={{ scale: 1, opacity: 0.3 }}
+                  animate={{ scale: 1.3 + (volume * 1.5), opacity: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeOut", delay: 0.5 }}
+                  className={`absolute inset-0 rounded-full border border-slate-300`}
+                />
+              </>
             )}
           </AnimatePresence>
 
           <motion.div
-            animate={isSpeaking ? { scale: [1, 1.02, 1] } : {}}
-            transition={{ repeat: Infinity, duration: 2 }}
-            className={`relative w-40 h-40 md:w-56 md:h-56 ${companion.iconColor} rounded-[2.5rem] p-1 shadow-lg flex items-center justify-center`}
+            animate={{
+              scale: isSpeaking ? 1.05 : 1,
+              y: [0, -4, 0]
+            }}
+            transition={{
+              scale: { duration: 0.2 },
+              y: { duration: 4, repeat: Infinity, ease: "easeInOut" }
+            }}
+            className={`w-48 h-48 md:w-64 md:h-64 rounded-full p-2 bg-white shadow-2xl relative z-10 flex items-center justify-center`}
           >
-            <div className="w-full h-full rounded-[2.2rem] bg-white/50 backdrop-blur-sm flex items-center justify-center border border-white/20">
-              <span className="text-7xl md:text-8xl">{companion.icon}</span>
+            <div className={`w-full h-full rounded-full ${companion.iconColor} flex items-center justify-center border-4 border-white overflow-hidden shadow-inner`}>
+              <span className="text-8xl md:text-9xl select-none">{companion.icon}</span>
             </div>
 
-            {callStatus === CallStatus.ACTIVE && isSpeaking && (
-              <div className="absolute -top-3 -right-3 bg-white p-2.5 rounded-xl shadow-md border border-gray-50">
-                <Activity size={16} className="text-[#FF5B37] animate-bounce" />
-              </div>
+            {callStatus === CallStatus.ACTIVE && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute bottom-2 right-2 bg-emerald-500 text-white p-3 rounded-full shadow-lg border-2 border-white"
+              >
+                <Activity size={20} className={isSpeaking ? "animate-pulse" : ""} />
+              </motion.div>
             )}
           </motion.div>
         </div>
 
-        <div className="text-center">
-          <h3 className="text-xl font-bold text-gray-900 mb-1">{companion.name}</h3>
-          <p className="text-gray-400 text-sm font-medium">Learning about <span className="text-gray-900">{companion.topic}</span></p>
-        </div>
-
-        {/* Console Container */}
-        <div className="w-full max-w-2xl bg-white rounded-3xl p-6 shadow-xl border border-gray-100 flex flex-col gap-6">
-          {/* Transcripts */}
+        {/* Transcription Display */}
+        <div className="w-full max-w-xl z-20 flex flex-col items-center">
           <div
             ref={scrollRef}
-            className="h-40 overflow-y-auto flex flex-col gap-4 no-scrollbar mask-gradient"
+            className="w-full h-32 overflow-y-auto px-4 mask-gradient-v2 no-scrollbar flex flex-col gap-4 mb-12"
           >
             <AnimatePresence mode="popLayout">
               {messages.length > 0 ? (
-                messages.slice(0, 3).map((msg, i) => (
+                messages.slice(-3).map((msg, i) => (
                   <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1 - (i * 0.3), y: 0 }}
-                    className="flex items-start gap-3"
+                    key={`${i}-${msg.content.slice(0, 10)}`}
+                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
                   >
-                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${msg.role === 'user' ? 'bg-gray-100 text-gray-400' : 'bg-orange-50 text-[#FF5B37]'}`}>
-                      {msg.role === 'user' ? <MessageSquare size={12} /> : <Brain size={12} />}
-                    </div>
-                    <p className={`text-sm md:text-base font-bold leading-relaxed ${msg.role === 'user' ? 'text-gray-400' : 'text-gray-900'}`}>
+                    <div className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm font-medium shadow-sm border ${msg.role === 'user'
+                        ? 'bg-slate-100 border-slate-200 text-slate-600 rounded-tr-none'
+                        : 'bg-white border-slate-100 text-slate-900 rounded-tl-none'
+                      }`}>
                       {msg.content}
-                    </p>
+                    </div>
                   </motion.div>
                 ))
               ) : (
-                <div className="h-full flex items-center justify-center flex-col gap-3 opacity-30">
-                  <Activity size={32} className="text-gray-300" />
-                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Waiting for interaction...</p>
+                <div className="h-full flex flex-col items-center justify-center opacity-20">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                    {callStatus === CallStatus.ACTIVE ? 'Listening for your voice...' : 'Ready when you are'}
+                  </p>
                 </div>
               )}
             </AnimatePresence>
           </div>
 
-          <div className="flex items-center gap-4 border-t border-gray-50 pt-6">
-            <div className="flex items-center gap-2">
+          {/* Action Center - Modern Circular Controls */}
+          <div className="flex items-center gap-8 px-8 py-6 bg-white/40 backdrop-blur-xl rounded-[3rem] border border-white/40 shadow-xl">
+            {/* Microhpone Toggle */}
+            <button
+              onClick={toggleMic}
+              disabled={callStatus !== CallStatus.ACTIVE}
+              className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ${!isMicOn ? 'bg-rose-500 text-white shadow-rose-200' : 'bg-slate-100 text-slate-400 hover:text-slate-900'
+                } ${callStatus !== CallStatus.ACTIVE ? 'opacity-20 translate-y-2' : 'hover:scale-110 active:scale-90 shadow-md border-2 border-white'}`}
+            >
+              {isMicOn ? <Mic size={22} /> : <MicOff size={22} />}
+            </button>
+
+            {/* Main Call Button - Large Circle */}
+            <div className="relative h-28 w-28">
+              <AnimatePresence>
+                {callStatus === CallStatus.CONNECTING && (
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 1.2, opacity: 0 }}
+                    className="absolute inset-[-10px] border-4 border-slate-200 border-t-orange-500 rounded-full animate-spin"
+                  />
+                )}
+              </AnimatePresence>
+
               <button
-                onClick={toggleMic}
-                disabled={callStatus !== CallStatus.ACTIVE}
-                className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${isMicOn
-                  ? 'bg-gray-50 text-gray-400 hover:text-gray-900'
-                  : 'bg-red-50 text-red-500'
-                  } ${callStatus !== CallStatus.ACTIVE ? 'opacity-30 cursor-not-allowed' : 'hover:scale-105 active:scale-95 border border-transparent hover:border-gray-200'}`}
+                onClick={toggleCall}
+                className={`w-full h-full rounded-full flex items-center justify-center transition-all duration-500 shadow-2xl relative z-10 border-4 border-white ${callStatus === CallStatus.ACTIVE
+                    ? 'bg-slate-900 hover:bg-slate-800'
+                    : 'bg-gradient-to-br from-orange-500 to-rose-500 hover:from-orange-600 hover:to-rose-600'
+                  } hover:scale-105 active:scale-95 group overflow-hidden`}
               >
-                {isMicOn ? <Mic size={20} /> : <MicOff size={20} />}
-              </button>
-              <button
-                className="w-12 h-12 bg-gray-50 text-gray-400 hover:text-gray-900 rounded-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all border border-transparent hover:border-gray-200"
-              >
-                <RotateCcw size={20} />
+                <AnimatePresence mode="wait">
+                  {callStatus === CallStatus.CONNECTING ? (
+                    <motion.div key="loader" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
+                      <Loader2 className="animate-spin text-white" size={32} />
+                    </motion.div>
+                  ) : callStatus === CallStatus.ACTIVE ? (
+                    <motion.div key="end" initial={{ scale: 0, rotate: -90 }} animate={{ scale: 1, rotate: 0 }} exit={{ scale: 0 }}>
+                      <PhoneOff className="text-white" size={32} />
+                    </motion.div>
+                  ) : (
+                    <motion.div key="start" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} className="flex flex-col items-center">
+                      <Phone fill="white" className="text-white" size={32} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Glass highlight effect */}
+                <div className="absolute top-0 left-0 w-full h-1/2 bg-white/10 rounded-t-full pointer-events-none" />
               </button>
             </div>
 
+            {/* Reset Session */}
             <button
-              onClick={toggleCall}
-              className={`flex-1 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 transition-all duration-300 shadow-md active:scale-[0.98] ${callStatus === CallStatus.ACTIVE || callStatus === CallStatus.CONNECTING
-                ? 'bg-gray-900 text-white'
-                : 'bg-[#FF5B37] text-white'
-                }`}
+              onClick={() => setMessages([])}
+              className="w-14 h-14 bg-slate-100 text-slate-400 hover:text-slate-900 rounded-full flex items-center justify-center hover:scale-110 active:scale-90 transition-all duration-300 border-2 border-white shadow-md"
             >
-              {callStatus === CallStatus.CONNECTING ? (
-                <>
-                  <Loader2 className="animate-spin w-4 h-4" />
-                  <span>Preparing...</span>
-                </>
-              ) : callStatus === CallStatus.ACTIVE ? (
-                <>
-                  <PhoneOff size={16} />
-                  <span>End Session</span>
-                </>
-              ) : (
-                <>
-                  <Phone size={16} fill="white" />
-                  <span>Start Session</span>
-                </>
-              )}
+              <RotateCcw size={22} />
             </button>
           </div>
+
+          <p className="mt-8 text-[11px] font-black uppercase tracking-[0.3em] text-slate-400/60 select-none">
+            {callStatus === CallStatus.ACTIVE ? 'Connected via Secure Voice' : 'Tap to initialize session'}
+          </p>
         </div>
       </main>
 
       <style jsx global>{`
-        .mask-gradient {
-          mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+        .mask-gradient-v2 {
+          mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
         }
         .no-scrollbar::-webkit-scrollbar {
           display: none;
