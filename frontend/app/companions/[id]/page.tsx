@@ -103,24 +103,38 @@ const LessonRoom: React.FC = () => {
     };
 
     const onError = (error: any) => {
-      console.error("Vapi Error:", error);
-      toast.error("Connection issue encountered", {
-        description: "Attempting to stabilize connection..."
-      });
+      console.error("Vapi Error Details:", error);
+
+      // Determine if this is a permission/WebRTC suppression error
+      const errorMessage = error.message || error.error?.message || "";
+      const isSuppressed = errorMessage.includes("WebRTC") || errorMessage.includes("suppressed") || errorMessage.includes("permission");
+
+      if (isSuppressed) {
+        toast.error("Microphone Access Blocked", {
+          description: "Please enable microphone permissions in your browser and ensure you are on a secure (HTTPS) connection.",
+          duration: 5000,
+        });
+      } else {
+        toast.error("Connection Issue", {
+          description: "We encountered a problem starting the session. Please refresh and try again.",
+        });
+      }
+
       setCallStatus(CallStatus.INACTIVE);
       setIsSpeaking(false);
       setVolume(0);
     };
 
-    const onMessage = (message: Message) => {
+    const handleTranscript = (message: any) => {
       if (message.type === "transcript" && message.transcriptType === "final" && message.transcript && message.role) {
         const newMessage: SavedMessage = { role: message.role, content: message.transcript };
         setMessages((prev) => [...prev, newMessage]);
       }
     };
 
+    // Subscriptions
     vapi.on("call-start", onCallStart);
-    vapi.on("message", onMessage);
+    vapi.on("message", handleTranscript);
     vapi.on("speech-start", () => setIsSpeaking(true));
     vapi.on("speech-end", () => setIsSpeaking(false));
     vapi.on("volume-level", (level: number) => setVolume(level));
@@ -129,7 +143,14 @@ const LessonRoom: React.FC = () => {
 
     return () => {
       vapi.stop();
-      vapi.removeAllListeners();
+      // Explicitly remove listeners to prevent duplicates on re-mount
+      vapi.off("call-start", onCallStart);
+      vapi.off("message", handleTranscript);
+      vapi.off("speech-start", () => setIsSpeaking(true));
+      vapi.off("speech-end", () => setIsSpeaking(false));
+      vapi.off("volume-level", (level: number) => setVolume(level));
+      vapi.off("error", onError);
+      vapi.off("call-end", onCallEnd);
     };
   }, [id]);
 
@@ -143,28 +164,51 @@ const LessonRoom: React.FC = () => {
 
   const handleStart = async () => {
     if (!companion) return;
+
+    // 1. Basic compatibility check
+    if (typeof window !== 'undefined') {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        toast.error("Unsupported Browser", {
+          description: "Your browser doesn't support WebRTC voice calls. Please try Chrome, Firefox, or Safari."
+        });
+        return;
+      }
+
+      if (!window.isSecureContext && window.location.hostname !== 'localhost') {
+        toast.error("Security Restriction", {
+          description: "Voice sessions require HTTPS. Please use a secure connection."
+        });
+        return;
+      }
+    }
+
     setCallStatus(CallStatus.CONNECTING);
     try {
+      // Ensure clean state before starting
+      await vapi.stop();
+
       const { getAssistantConfig } = await import('@/config/vapi');
       const assistantConfig = getAssistantConfig(companion, session?.user);
       await vapi.start(assistantConfig);
     } catch (err: any) {
-      console.error("Vapi start error:", err);
-      toast.error("Initialization Failed");
-      setCallStatus(CallStatus.INACTIVE);
+      console.error("Vapi start execution error:", err);
+      onError(err);
     }
   };
 
   const handleStop = async () => {
-    vapi.stop();
-    if (companion) {
-      try {
+    try {
+      await vapi.stop();
+      if (companion) {
         await addToHistory(companion.id);
-      } catch (e) {
-        console.error("History sync failed");
       }
+    } catch (e) {
+      console.error("Cleanup error:", e);
+    } finally {
+      setCallStatus(CallStatus.INACTIVE);
+      setIsSpeaking(false);
+      setVolume(0);
     }
-    setCallStatus(CallStatus.INACTIVE);
   };
 
   const toggleMic = () => {
@@ -287,8 +331,8 @@ const LessonRoom: React.FC = () => {
                     className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
                   >
                     <div className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm font-medium shadow-sm border ${msg.role === 'user'
-                        ? 'bg-slate-100 border-slate-200 text-slate-600 rounded-tr-none'
-                        : 'bg-white border-slate-100 text-slate-900 rounded-tl-none'
+                      ? 'bg-slate-100 border-slate-200 text-slate-600 rounded-tr-none'
+                      : 'bg-white border-slate-100 text-slate-900 rounded-tl-none'
                       }`}>
                       {msg.content}
                     </div>
@@ -332,8 +376,8 @@ const LessonRoom: React.FC = () => {
               <button
                 onClick={toggleCall}
                 className={`w-full h-full rounded-full flex items-center justify-center transition-all duration-500 shadow-2xl relative z-10 border-4 border-white ${callStatus === CallStatus.ACTIVE
-                    ? 'bg-slate-900 hover:bg-slate-800'
-                    : 'bg-gradient-to-br from-orange-500 to-rose-500 hover:from-orange-600 hover:to-rose-600'
+                  ? 'bg-slate-900 hover:bg-slate-800'
+                  : 'bg-gradient-to-br from-orange-500 to-rose-500 hover:from-orange-600 hover:to-rose-600'
                   } hover:scale-105 active:scale-95 group overflow-hidden`}
               >
                 <AnimatePresence mode="wait">
