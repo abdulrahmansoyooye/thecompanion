@@ -126,12 +126,9 @@ Overall:
 
 The function is well-structured, predictable, and easy to test.
 
-💭 Final thoughts
+💭 Final Ouput
+<img width="1115" height="446" alt="image" src="https://github.com/user-attachments/assets/77936d37-9269-40f1-afc6-9345da18ff99" />
 
-This was a great starting point for unit testing because:
-
-It’s a pure function
-No external dependencies
 Clear input → output relationship
 Next steps:
 Test custom hooks
